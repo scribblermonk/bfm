@@ -353,4 +353,6 @@ CMakeFiles/bfm.dir/main.cpp.o: /home/nikolai/Documents/bfm/main.cpp \
  /usr/include/c++/12/fstream \
  /usr/include/x86_64-linux-gnu/c++/12/bits/basic_file.h \
  /usr/include/x86_64-linux-gnu/c++/12/bits/c++io.h \
- /usr/include/c++/12/bits/fstream.tcc
+ /usr/include/c++/12/bits/fstream.tcc \
+ /home/nikolai/Documents/bfm/build/_deps/fmt-src/include/fmt/ranges.h \
+ /home/nikolai/Documents/bfm/build/_deps/fmt-src/include/fmt/format.h

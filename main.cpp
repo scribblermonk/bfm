@@ -8,6 +8,7 @@
 #include <fmt/format.h>
 #include <fstream>
 #include <unordered_set>
+#include <fmt/ranges.h>
 
 using namespace fmindex_collection; // für die ganzen fmindex methode, fmindex_collection:: nicht notwendig 
 
@@ -75,7 +76,7 @@ int main(int argc, char const* const* argv) {
             chromosomes[i].push_back(5); //{ a, b} -> { a, b, #}
             std::vector<uint8_t> temp = reverse_complement_generator(chromosomes[i]); // { a, b, #} -> { a, b, #, b, a}
             chromosomes[i].insert(chromosomes[i].end(), temp.begin(), temp.end());
-            fmt::print("Inklusive reverse Complement:", chromosomes[i]); // Debugging 
+            fmt::print("{}", fmt::join(chromosomes[i], ",")); // Debugging 
         }
 
     {
