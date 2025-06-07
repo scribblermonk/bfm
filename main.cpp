@@ -32,17 +32,16 @@ auto loadIndex(std::filesystem::path _fileName) {
     return index;
 }
 
-std::vector<uint8_t> reverse_complement_generator(std::vector<uint8_t>& ref){
-    size_t i = size(ref)-1;
-    std::vector<uint8_t> reverse_complement = {};
-    
-    while(i > 0){
-        
+std::vector<uint8_t> reverse_complement_generator(std::vector<uint8_t> const& ref){
+    size_t i = size(ref)-1; // bei 0 anfangen zu zählen
+    std::vector<uint8_t> reverse_complement = {}; 
+    reverse_complement.reserve(size(ref)); 
+    while(i > 0){ 
         switch(ref[i]) {
             case 1:
             reverse_complement.push_back(4);
             break;
-            
+
             case 2:
             reverse_complement.push_back(3);
             break;
@@ -59,37 +58,39 @@ std::vector<uint8_t> reverse_complement_generator(std::vector<uint8_t>& ref){
             fmt::print("count error");
         }
         i--;
-
-    }
-
+    }  
     return reverse_complement;
 }
 
 int main(int argc, char const* const* argv) {
     (void)argc; // (void) sind nur für die strikten regeln des compilers
     (void)argv;
-    auto reference = std::vector<std::vector<uint8_t>>{{4, 4, 4, 4, 1, 2, 2, 2, 1, 2, 3, 4, 4, 4, 4}}; // unser  Text/Referenz - Vektor mit {T, T, T, T, A, C, C, C, A, C, G, T, T, T, T} 
 
-    for(size_t i = 0; i < reference.size(); i++){
-        std::vector<uint8_t> ref = reference[i];
-        std::vector<uint8_t> rev_ref = reverse_complement_generator(ref); // rev_ref existiert zur übersichtlichkeit 
-        reference[i] = rev_ref; //kann man alternativ effektiver mit pointern lösen..
-    }
+        auto chromosomes = std::vector<std::vector<uint8_t>>{{4, 4, 4, 4, 1, 2, 2, 2, 1, 2, 3, 4, 4, 4, 4}}; // unser  Text/Referenz - Vektor mit {T, T, T, T, A, C, C, C, A, C, G, T, T, T, T} 
+        auto chromosomes_with_complement = chromosomes; 
+        // hier wird einfach nur kopiert (optimierbar)
+        // endziel: aauuüüää (mit äs und üs als reverse strings)   
+
+        for (size_t i = 0; i < size(chromosomes)-1; i++){ // iterator durch chromosomes
+            chromosomes[i].push_back(5); //{ a, b} -> { a, b, #}
+            std::vector<uint8_t> temp = reverse_complement_generator(chromosomes[i]); // { a, b, #} -> { a, b, #, b, a}
+            chromosomes[i].insert(chromosomes[i].end(), temp.begin(), temp.end());
+            fmt::print("Inklusive reverse Complement:", chromosomes[i]); // Debugging 
+        }
 
     {
         std::cout << "\nBiFMIndex:\n";
-        auto index = BiFMIndex<String<Sigma>>{reference, /*samplingRate*/16, /*threadNbr*/1};
+        auto index = BiFMIndex<String<Sigma>>{chromosomes, /*samplingRate*/16, /*threadNbr*/1};
         auto queries = std::vector<std::vector<uint8_t>>{{3, 4, 3}, {2, 1, 2}}; // unser Pattern/Read - Vektor {G, T, G} {C, A, C}
 
         search_backtracking::search(index, queries, 0, [&](size_t queryId, auto cursor, size_t errors) {
             (void)errors;
             fmt::print("found something {} {}\n", queryId, cursor.count()); // cursor.count() == range, range begriff wird verwechselt, print fmt kombiniert printf und stdcout
             for (auto i : cursor) {  
-                auto [chr, pos] = index.locate(i); // curs
+                auto [chr, pos] = index.locate(i); // cursor stuff
                 fmt::print("chr/pos: {}/{}\n", chr, pos);
             }
         });
     }
-
     return 0;
 }

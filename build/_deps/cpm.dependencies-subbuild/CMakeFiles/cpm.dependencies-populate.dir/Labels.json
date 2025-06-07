@@ -1,0 +1,46 @@
+{
+	"sources" : 
+	[
+		{
+			"file" : "/home/nikolai/Documents/bfm/build/_deps/cpm.dependencies-subbuild/CMakeFiles/cpm.dependencies-populate"
+		},
+		{
+			"file" : "/home/nikolai/Documents/bfm/build/_deps/cpm.dependencies-subbuild/CMakeFiles/cpm.dependencies-populate.rule"
+		},
+		{
+			"file" : "/home/nikolai/Documents/bfm/build/_deps/cpm.dependencies-subbuild/CMakeFiles/cpm.dependencies-populate-complete.rule"
+		},
+		{
+			"file" : "/home/nikolai/Documents/bfm/build/_deps/cpm.dependencies-subbuild/cpm.dependencies-populate-prefix/src/cpm.dependencies-populate-stamp/cpm.dependencies-populate-build.rule"
+		},
+		{
+			"file" : "/home/nikolai/Documents/bfm/build/_deps/cpm.dependencies-subbuild/cpm.dependencies-populate-prefix/src/cpm.dependencies-populate-stamp/cpm.dependencies-populate-configure.rule"
+		},
+		{
+			"file" : "/home/nikolai/Documents/bfm/build/_deps/cpm.dependencies-subbuild/cpm.dependencies-populate-prefix/src/cpm.dependencies-populate-stamp/cpm.dependencies-populate-download.rule"
+		},
+		{
+			"file" : "/home/nikolai/Documents/bfm/build/_deps/cpm.dependencies-subbuild/cpm.dependencies-populate-prefix/src/cpm.dependencies-populate-stamp/cpm.dependencies-populate-install.rule"
+		},
+		{
+			"file" : "/home/nikolai/Documents/bfm/build/_deps/cpm.dependencies-subbuild/cpm.dependencies-populate-prefix/src/cpm.dependencies-populate-stamp/cpm.dependencies-populate-mkdir.rule"
+		},
+		{
+			"file" : "/home/nikolai/Documents/bfm/build/_deps/cpm.dependencies-subbuild/cpm.dependencies-populate-prefix/src/cpm.dependencies-populate-stamp/cpm.dependencies-populate-patch.rule"
+		},
+		{
+			"file" : "/home/nikolai/Documents/bfm/build/_deps/cpm.dependencies-subbuild/cpm.dependencies-populate-prefix/src/cpm.dependencies-populate-stamp/cpm.dependencies-populate-test.rule"
+		},
+		{
+			"file" : "/home/nikolai/Documents/bfm/build/_deps/cpm.dependencies-subbuild/cpm.dependencies-populate-prefix/src/cpm.dependencies-populate-stamp/cpm.dependencies-populate-update.rule"
+		}
+	],
+	"target" : 
+	{
+		"labels" : 
+		[
+			"cpm.dependencies-populate"
+		],
+		"name" : "cpm.dependencies-populate"
+	}
+}

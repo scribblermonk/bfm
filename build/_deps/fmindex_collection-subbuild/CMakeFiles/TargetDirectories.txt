@@ -1,0 +1,3 @@
+/home/nikolai/Documents/bfm/build/_deps/fmindex_collection-subbuild/CMakeFiles/fmindex_collection-populate.dir
+/home/nikolai/Documents/bfm/build/_deps/fmindex_collection-subbuild/CMakeFiles/edit_cache.dir
+/home/nikolai/Documents/bfm/build/_deps/fmindex_collection-subbuild/CMakeFiles/rebuild_cache.dir

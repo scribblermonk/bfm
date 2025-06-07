@@ -1,0 +1,46 @@
+{
+	"sources" : 
+	[
+		{
+			"file" : "/home/nikolai/Documents/bfm/build/_deps/fmindex_collection-subbuild/CMakeFiles/fmindex_collection-populate"
+		},
+		{
+			"file" : "/home/nikolai/Documents/bfm/build/_deps/fmindex_collection-subbuild/CMakeFiles/fmindex_collection-populate.rule"
+		},
+		{
+			"file" : "/home/nikolai/Documents/bfm/build/_deps/fmindex_collection-subbuild/CMakeFiles/fmindex_collection-populate-complete.rule"
+		},
+		{
+			"file" : "/home/nikolai/Documents/bfm/build/_deps/fmindex_collection-subbuild/fmindex_collection-populate-prefix/src/fmindex_collection-populate-stamp/fmindex_collection-populate-build.rule"
+		},
+		{
+			"file" : "/home/nikolai/Documents/bfm/build/_deps/fmindex_collection-subbuild/fmindex_collection-populate-prefix/src/fmindex_collection-populate-stamp/fmindex_collection-populate-configure.rule"
+		},
+		{
+			"file" : "/home/nikolai/Documents/bfm/build/_deps/fmindex_collection-subbuild/fmindex_collection-populate-prefix/src/fmindex_collection-populate-stamp/fmindex_collection-populate-download.rule"
+		},
+		{
+			"file" : "/home/nikolai/Documents/bfm/build/_deps/fmindex_collection-subbuild/fmindex_collection-populate-prefix/src/fmindex_collection-populate-stamp/fmindex_collection-populate-install.rule"
+		},
+		{
+			"file" : "/home/nikolai/Documents/bfm/build/_deps/fmindex_collection-subbuild/fmindex_collection-populate-prefix/src/fmindex_collection-populate-stamp/fmindex_collection-populate-mkdir.rule"
+		},
+		{
+			"file" : "/home/nikolai/Documents/bfm/build/_deps/fmindex_collection-subbuild/fmindex_collection-populate-prefix/src/fmindex_collection-populate-stamp/fmindex_collection-populate-patch.rule"
+		},
+		{
+			"file" : "/home/nikolai/Documents/bfm/build/_deps/fmindex_collection-subbuild/fmindex_collection-populate-prefix/src/fmindex_collection-populate-stamp/fmindex_collection-populate-test.rule"
+		},
+		{
+			"file" : "/home/nikolai/Documents/bfm/build/_deps/fmindex_collection-subbuild/fmindex_collection-populate-prefix/src/fmindex_collection-populate-stamp/fmindex_collection-populate-update.rule"
+		}
+	],
+	"target" : 
+	{
+		"labels" : 
+		[
+			"fmindex_collection-populate"
+		],
+		"name" : "fmindex_collection-populate"
+	}
+}
