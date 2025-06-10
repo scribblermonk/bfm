@@ -2,7 +2,6 @@
 #include <fmindex-collection/search/all.h>
 #include <fmindex-collection/search_scheme/expand.h>
 #include <fmindex-collection/search_scheme/generator/all.h>
-
 #include <cereal/archives/binary.hpp>
 #include <filesystem>
 #include <fmt/format.h>
@@ -33,6 +32,27 @@ auto loadIndex(std::filesystem::path _fileName) {
     auto index = Index{};
     archive(index);
     return index;
+}
+
+std::vector<uint8_t> reduction(std::vector<uint8_t> const& ref){
+    std::vector<uint8_t> reduced = {}; 
+    reduced.reserve(size(ref)); 
+    for (const uint8_t& i: ref)
+        {
+        switch(i) {
+                case 3:
+                reduced.push_back(2);
+                break;
+
+                case 4:
+                reduced.push_back(1);
+                break;
+
+                default:
+                reduced.push_back(i);
+        }
+        }  
+    return reduced;
 }
 
 std::vector<uint8_t> reverse_complement_generator(std::vector<uint8_t> const& ref){
@@ -74,12 +94,12 @@ int main(int argc, char const* const* argv) {
         // endziel: aauuüüää (mit äs und üs als reverse strings)   
 
         for (size_t i = 0; i < size(chromosomes); i++){ // iterator durch chromosomes
+            std::vector<uint8_t> reduced = reduction(chromosomes[i]);
+            fmt::print("{}", reduced);
             std::vector<uint8_t> temp = reverse_complement_generator(chromosomes[i]);
-            chromosomes[i].push_back(5); //{ a, b} -> { a, b, 5}
+            chromosomes[i].push_back(5); // { a, b} -> { a, b, 5}
             chromosomes[i].insert(chromosomes[i].end(), temp.begin(), temp.end());  // { a, b, 5} -> { a, b, 5, b, a}
- 
         }
-
     {
         std::cout << "\nBiFMIndex:\n";
         auto index = BiFMIndex<String<Sigma>>{chromosomes, /*samplingRate*/16, /*threadNbr*/1};
@@ -94,5 +114,5 @@ int main(int argc, char const* const* argv) {
             }
         });
     }
-    return 0;
+    return 0; 
 }
