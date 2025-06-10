@@ -9,10 +9,12 @@
 #include <fstream>
 #include <unordered_set>
 #include <fmt/ranges.h>
+#include <iostream>
+#include <ranges>
 
 using namespace fmindex_collection; // für die ganzen fmindex methode, fmindex_collection:: nicht notwendig 
 
-constexpr size_t Sigma = 5; // sigma steht für alphabetgröße
+constexpr size_t Sigma = 6; // sigma steht für alphabetgröße
 
 template <size_t Sigma>
 using String = string::InterleavedBitvector16<Sigma>; // häh was ist das? 
@@ -34,11 +36,11 @@ auto loadIndex(std::filesystem::path _fileName) {
 }
 
 std::vector<uint8_t> reverse_complement_generator(std::vector<uint8_t> const& ref){
-    size_t i = size(ref)-1; // bei 0 anfangen zu zählen
     std::vector<uint8_t> reverse_complement = {}; 
     reverse_complement.reserve(size(ref)); 
-    while(i > 0){ 
-        switch(ref[i]) {
+    for (const uint8_t& i: ref | std::views::reverse)
+    { 
+        switch(i) {
             case 1:
             reverse_complement.push_back(4);
             break;
@@ -56,9 +58,8 @@ std::vector<uint8_t> reverse_complement_generator(std::vector<uint8_t> const& re
             break;
 
             default:
-            fmt::print("count error");
+            fmt::print("count error \n");
         }
-        i--;
     }  
     return reverse_complement;
 }
@@ -72,11 +73,11 @@ int main(int argc, char const* const* argv) {
         // hier wird einfach nur kopiert (optimierbar)
         // endziel: aauuüüää (mit äs und üs als reverse strings)   
 
-        for (size_t i = 0; i < size(chromosomes)-1; i++){ // iterator durch chromosomes
-            chromosomes[i].push_back(5); //{ a, b} -> { a, b, #}
-            std::vector<uint8_t> temp = reverse_complement_generator(chromosomes[i]); // { a, b, #} -> { a, b, #, b, a}
-            chromosomes[i].insert(chromosomes[i].end(), temp.begin(), temp.end());
-            fmt::print("{}", fmt::join(chromosomes[i], ",")); // Debugging 
+        for (size_t i = 0; i < size(chromosomes); i++){ // iterator durch chromosomes
+            std::vector<uint8_t> temp = reverse_complement_generator(chromosomes[i]);
+            chromosomes[i].push_back(5); //{ a, b} -> { a, b, 5}
+            chromosomes[i].insert(chromosomes[i].end(), temp.begin(), temp.end());  // { a, b, 5} -> { a, b, 5, b, a}
+ 
         }
 
     {

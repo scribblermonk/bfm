@@ -425,7 +425,9 @@ CMakeFiles/bfm.dir/main.cpp.o: /home/nikolai/Documents/bfm/main.cpp \
   /usr/include/c++/12/fstream \
   /usr/include/x86_64-linux-gnu/c++/12/bits/basic_file.h \
   /usr/include/x86_64-linux-gnu/c++/12/bits/c++io.h \
-  /usr/include/c++/12/bits/fstream.tcc
+  /usr/include/c++/12/bits/fstream.tcc \
+  _deps/fmt-src/include/fmt/ranges.h \
+  _deps/fmt-src/include/fmt/format.h
 
 
 /usr/include/c++/12/bits/fstream.tcc:
@@ -1087,6 +1089,8 @@ _deps/fmindex-collection-src/src/fmindex-collection/search/SearchNg12.h:
 _deps/fmindex-collection-src/src/fmindex-collection/search/SearchNg21V7.h:
 
 /usr/include/c++/12/bits/uses_allocator_args.h:
+
+_deps/fmt-src/include/fmt/ranges.h:
 
 /usr/include/c++/12/bits/basic_string.tcc:
 
