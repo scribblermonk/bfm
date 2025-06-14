@@ -13,7 +13,7 @@
 
 using namespace fmindex_collection; // für die ganzen fmindex methode, fmindex_collection:: nicht notwendig 
 
-constexpr size_t Sigma = 6; // sigma steht für alphabetgröße
+constexpr size_t Sigma = 6; // Sigma steht für alphabetgröße
 
 template <size_t Sigma>
 using String = string::InterleavedBitvector16<Sigma>; // häh was ist das? 
@@ -84,6 +84,16 @@ std::vector<uint8_t> reverse_complement_generator(std::vector<uint8_t> const& re
     return reverse_complement;
 }
 
+std::vector<std::vector<uint8_t>> reverse_complement_iterator(std::vector<std::vector<uint8_t>> chromosomes){
+    for (size_t i = 0; i < size(chromosomes); i++){ // iterator durch chromosomes
+        std::vector<uint8_t> temp = reverse_complement_generator(chromosomes[i]);
+        chromosomes[i].push_back(5); // { a, b} -> { a, b, 5}
+        chromosomes[i].insert(chromosomes[i].end(), temp.begin(), temp.end());  // { a, b, 5} -> { a, b, 5, b, a}
+        fmt::print("{} \n", chromosomes[i]);
+    }
+    return chromosomes;
+}
+
 int main(int argc, char const* const* argv) {
     (void)argc; // (void) sind nur für die strikten regeln des compilers
     (void)argv;
@@ -93,17 +103,27 @@ int main(int argc, char const* const* argv) {
         // hier wird einfach nur kopiert (optimierbar)
         // endziel: aauuüüää (mit äs und üs als reverse strings)   
 
-        for (size_t i = 0; i < size(chromosomes); i++){ // iterator durch chromosomes
-            std::vector<uint8_t> reduced = reduction(chromosomes[i]);
-            fmt::print("{}", reduced);
-            std::vector<uint8_t> temp = reverse_complement_generator(chromosomes[i]);
-            chromosomes[i].push_back(5); // { a, b} -> { a, b, 5}
-            chromosomes[i].insert(chromosomes[i].end(), temp.begin(), temp.end());  // { a, b, 5} -> { a, b, 5, b, a}
+        // ohne reduction
+        reverse_complement_iterator(chromosomes);
+
+        // mit reduction
+        for (size_t i = 0; i < size(chromosomes); i++){ 
+            chromosomes[i] = reduction(chromosomes[i]); // einfach nur mit dieser extra for loop
         }
-    {
+        reverse_complement_iterator(chromosomes);
+
+        {
         std::cout << "\nBiFMIndex:\n";
         auto index = BiFMIndex<String<Sigma>>{chromosomes, /*samplingRate*/16, /*threadNbr*/1};
+        
+        // ohne reduction 
         auto queries = std::vector<std::vector<uint8_t>>{{3, 4, 3}, {2, 1, 2}}; // unser Pattern/Read - Vektor {G, T, G} {C, A, C}
+
+        // mit reduction
+        std::vector<std::vector<uint8_t>> reduced_queries;
+        for(std::vector<uint8_t> query : queries){
+            reduced_queries.push_back(reduction(query));
+        }
 
         search_backtracking::search(index, queries, 0, [&](size_t queryId, auto cursor, size_t errors) {
             (void)errors;
@@ -113,6 +133,14 @@ int main(int argc, char const* const* argv) {
                 fmt::print("chr/pos: {}/{}\n", chr, pos);
             }
         });
-    }
+        }
+
     return 0; 
 }
+
+
+// Aktueller Plan und Frage //
+// Wie wollen wir wollen wir das Reverse Kompliment bei handeln postreduktion?
+// Patternreduktion
+// Patterntesting
+// Main mit 0-1 um reduction an und aus zu stellen
