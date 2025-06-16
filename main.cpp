@@ -140,6 +140,8 @@ int main(int argc, char const* const* argv) {
 
 
 // Aktueller Plan und Frage //
+// build ordner wieder entfernen 
+// Gitignore verstehen und benutzen
 // Wie wollen wir wollen wir das Reverse Kompliment bei handeln postreduktion?
 // Patternreduktion
 // Patterntesting
