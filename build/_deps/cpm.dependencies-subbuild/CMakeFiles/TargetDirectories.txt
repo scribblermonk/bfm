@@ -1,3 +1,0 @@
-/home/nikolai/Documents/bfm/build/_deps/cpm.dependencies-subbuild/CMakeFiles/cpm.dependencies-populate.dir
-/home/nikolai/Documents/bfm/build/_deps/cpm.dependencies-subbuild/CMakeFiles/edit_cache.dir
-/home/nikolai/Documents/bfm/build/_deps/cpm.dependencies-subbuild/CMakeFiles/rebuild_cache.dir
