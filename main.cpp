@@ -55,62 +55,69 @@ std::vector<uint8_t> reduction(std::vector<uint8_t> const& ref){
     return reduced;
 }
 
-std::vector<uint8_t> reverse_complement_generator(std::vector<uint8_t> const& ref){
-    std::vector<uint8_t> reverse_complement = {}; 
-    reverse_complement.reserve(size(ref)); 
-    for (const uint8_t& i: ref | std::views::reverse)
-    { 
-        switch(i) {
-            case 1:
-            reverse_complement.push_back(4);
-            break;
+std::vector<std::vector<uint8_t>> reverse_complement_generator(std::vector<std::vector<uint8_t>>& chromosomes){
+    
+    for(std::vector<uint8_t> ref : chromosomes){
+    
+        std::vector<uint8_t> reverse_complement = {}; 
+        reverse_complement.reserve(size(ref)); 
 
-            case 2:
-            reverse_complement.push_back(3);
-            break;
+        for (const uint8_t& i: ref | std::views::reverse)
+        { 
+            switch(i) {
+                case 1:
+                reverse_complement.push_back(4);
+                break;
 
-            case 3:
-            reverse_complement.push_back(2);
-            break;
+                case 2:
+                reverse_complement.push_back(3);
+                break;
 
-            case 4:
-            reverse_complement.push_back(1);
-            break;
+                case 3:
+                reverse_complement.push_back(2);
+                break;
 
-            default:
-            fmt::print("count error \n");
-        }
-    }  
-    return reverse_complement;
-}
+                case 4:
+                reverse_complement.push_back(1);
+                break;
 
-std::vector<std::vector<uint8_t>> reverse_complement_iterator(std::vector<std::vector<uint8_t>> chromosomes){
-    for (size_t i = 0; i < size(chromosomes); i++){ // iterator durch chromosomes
-        std::vector<uint8_t> temp = reverse_complement_generator(chromosomes[i]);
-        chromosomes[i].push_back(5); // { a, b} -> { a, b, 5}
-        chromosomes[i].insert(chromosomes[i].end(), temp.begin(), temp.end());  // { a, b, 5} -> { a, b, 5, b, a}
-        fmt::print("{} \n", chromosomes[i]);
+                default:
+                fmt::print("count error \n");
+            }
+        }  
+        ref.push_back(5);
+        ref.insert(ref.end(), reverse_complement.begin(), reverse_complement.end());  // { a, b, 5} -> { a, b, 5, b, a}
+        fmt::print("{} \n", ref);
     }
     return chromosomes;
 }
 
+// std::vector<std::vector<uint8_t>> nameless(std::vector<std::vector<uint8_t>> chromosomes){
+//     for (size_t i = 0; i < size(chromosomes); i++){ // iterator durch chromosomes
+//         std::vector<uint8_t> temp = reverse_complement_generator(chromosomes[i]);
+//         chromosomes[i].push_back(5); // { a, b} -> { a, b, 5} // nicht vergessen in der Main möglicherweise einfach dran zu hängen
+//         chromosomes[i].insert(chromosomes[i].end(), temp.begin(), temp.end());  // { a, b, 5} -> { a, b, 5, b, a}
+//         fmt::print("{} \n", chromosomes[i]);
+//     }
+//     return chromosomes;
+// }
+
 int main(int argc, char const* const* argv) {
     (void)argc; // (void) sind nur für die strikten regeln des compilers
     (void)argv;
-
         auto chromosomes = std::vector<std::vector<uint8_t>>{{4, 4, 4, 4, 1, 2, 2, 2, 1, 2, 3, 4, 4, 4, 4}}; // unser  Text/Referenz - Vektor mit {T, T, T, T, A, C, C, C, A, C, G, T, T, T, T} 
         auto chromosomes_with_complement = chromosomes; 
         // hier wird einfach nur kopiert (optimierbar)
         // endziel: aauuüüää (mit äs und üs als reverse strings)   
 
         // ohne reduction
-        reverse_complement_iterator(chromosomes);
+        reverse_complement_generator(chromosomes);
 
         // mit reduction
-        for (size_t i = 0; i < size(chromosomes); i++){ 
-            chromosomes[i] = reduction(chromosomes[i]); // einfach nur mit dieser extra for loop
-        }
-        reverse_complement_iterator(chromosomes);
+        // for (size_t i = 0; i < size(chromosomes); i++){ 
+        //     chromosomes[i] = reduction(chromosomes[i]); // einfach nur mit dieser extra for loop
+        // }
+        // reverse_complement_iterator(chromosomes);
 
         {
         std::cout << "\nBiFMIndex:\n";
@@ -126,7 +133,7 @@ int main(int argc, char const* const* argv) {
         }
 
         search_backtracking::search(index, queries, 0, [&](size_t queryId, auto cursor, size_t errors) {
-            (void)errors;
+            (void) errors;
             fmt::print("found something {} {}\n", queryId, cursor.count()); // cursor.count() == range, range begriff wird verwechselt, print fmt kombiniert printf und stdcout
             for (auto i : cursor) {  
                 auto [chr, pos] = index.locate(i); // cursor stuff
@@ -134,16 +141,11 @@ int main(int argc, char const* const* argv) {
             }
         });
         }
-
     return 0; 
 }
 
-
-// Aktueller Plan und Frage //
-// build ordner wieder entfernen 
-// Gitignore verstehen und benutzen
-// Gitignore testen
-// Wie wollen wir wollen wir das Reverse Kompliment bei handeln postreduktion?
+// Aktueller Plan und Frage 
+// komplett getrennte funktionen, jeweils eine fürs reverse kompliment und einmal nur reverse lol
 // Patternreduktion
 // Patterntesting
 // Main mit 0-1 um reduction an und aus zu stellen
