@@ -55,10 +55,20 @@ std::vector<uint8_t> reduction(std::vector<uint8_t> const& ref){
     return reduced;
 }
 
-std::vector<std::vector<uint8_t>> reverse_complement_generator(std::vector<std::vector<uint8_t>>& chromosomes){
+std::vector<std::vector<uint8_t>> reverse_generator(std::vector<std::vector<uint8_t>>& chromosomes){
+    for(std::vector<uint8_t> ref : chromosomes){
+        std::vector<uint8_t> reverse_ref = ref;
+        std::reverse(reverse_ref.begin(), reverse_ref.end());
+        ref.push_back(5);
+        ref.insert(ref.end(), reverse_ref.begin(), reverse_ref.end());
+        fmt::print("{} \n", ref); //debugging 
+    }
+    return chromosomes;
+}
+
+std::vector<std::vector<uint8_t>> reverse_complement_generator(std::vector<std::vector<uint8_t>>& chromosomes){    
     
     for(std::vector<uint8_t> ref : chromosomes){
-    
         std::vector<uint8_t> reverse_complement = {}; 
         reverse_complement.reserve(size(ref)); 
 
@@ -87,7 +97,7 @@ std::vector<std::vector<uint8_t>> reverse_complement_generator(std::vector<std::
         }  
         ref.push_back(5);
         ref.insert(ref.end(), reverse_complement.begin(), reverse_complement.end());  // { a, b, 5} -> { a, b, 5, b, a}
-        fmt::print("{} \n", ref);
+        fmt::print("{} \n", ref); //debugging 
     }
     return chromosomes;
 }
@@ -96,7 +106,7 @@ std::vector<std::vector<uint8_t>> reverse_complement_generator(std::vector<std::
 //     for (size_t i = 0; i < size(chromosomes); i++){ // iterator durch chromosomes
 //         std::vector<uint8_t> temp = reverse_complement_generator(chromosomes[i]);
 //         chromosomes[i].push_back(5); // { a, b} -> { a, b, 5} // nicht vergessen in der Main möglicherweise einfach dran zu hängen
-//         chromosomes[i].insert(chromosomes[i].end(), temp.begin(), temp.end());  // { a, b, 5} -> { a, b, 5, b, a}
+//         chromosomes[i].insert(chromosomes[i].end(), temyp.begin(), temp.end());  // { a, b, 5} -> { a, b, 5, b, a}
 //         fmt::print("{} \n", chromosomes[i]);
 //     }
 //     return chromosomes;
@@ -113,11 +123,11 @@ int main(int argc, char const* const* argv) {
         // ohne reduction
         reverse_complement_generator(chromosomes);
 
-        // mit reduction
-        // for (size_t i = 0; i < size(chromosomes); i++){ 
-        //     chromosomes[i] = reduction(chromosomes[i]); // einfach nur mit dieser extra for loop
-        // }
-        // reverse_complement_iterator(chromosomes);
+        //mit reduction
+        for (size_t i = 0; i < size(chromosomes); i++){ 
+            chromosomes[i] = reduction(chromosomes[i]); // einfach nur mit dieser extra for loop
+        }
+        reverse_generator(chromosomes);
 
         {
         std::cout << "\nBiFMIndex:\n";
