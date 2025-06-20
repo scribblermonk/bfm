@@ -55,20 +55,20 @@ std::vector<uint8_t> reduction(std::vector<uint8_t> const& ref){
     return reduced;
 }
 
-std::vector<std::vector<uint8_t>> reverse_generator(std::vector<std::vector<uint8_t>>& chromosomes){
-    for(std::vector<uint8_t> ref : chromosomes){
+std::vector<std::vector<uint8_t>> reverse_generator(std::vector<std::vector<uint8_t>> chromosomes){
+    for(std::vector<uint8_t>& ref : chromosomes){
         std::vector<uint8_t> reverse_ref = ref;
         std::reverse(reverse_ref.begin(), reverse_ref.end());
         ref.push_back(5);
         ref.insert(ref.end(), reverse_ref.begin(), reverse_ref.end());
-        fmt::print("{} \n", ref); //debugging 
+        // fmt::print("{} \n", ref); //debugging 
     }
     return chromosomes;
 }
 
-std::vector<std::vector<uint8_t>> reverse_complement_generator(std::vector<std::vector<uint8_t>>& chromosomes){    
+std::vector<std::vector<uint8_t>> reverse_complement_generator(std::vector<std::vector<uint8_t>> chromosomes){    
     
-    for(std::vector<uint8_t> ref : chromosomes){
+    for(std::vector<uint8_t>& ref : chromosomes){    // call by reference critical for functionality
         std::vector<uint8_t> reverse_complement = {}; 
         reverse_complement.reserve(size(ref)); 
 
@@ -97,7 +97,7 @@ std::vector<std::vector<uint8_t>> reverse_complement_generator(std::vector<std::
         }  
         ref.push_back(5);
         ref.insert(ref.end(), reverse_complement.begin(), reverse_complement.end());  // { a, b, 5} -> { a, b, 5, b, a}
-        fmt::print("{} \n", ref); //debugging 
+        //fmt::print("{} \n", ref); //debugging 
     }
     return chromosomes;
 }
@@ -115,32 +115,24 @@ std::vector<std::vector<uint8_t>> reverse_complement_generator(std::vector<std::
 int main(int argc, char const* const* argv) {
     (void)argc; // (void) sind nur für die strikten regeln des compilers
     (void)argv;
-        auto chromosomes = std::vector<std::vector<uint8_t>>{{4, 4, 4, 4, 1, 2, 2, 2, 1, 2, 3, 4, 4, 4, 4}}; // unser  Text/Referenz - Vektor mit {T, T, T, T, A, C, C, C, A, C, G, T, T, T, T} 
+    
+    bool reduced = true;
+    auto queries = std::vector<std::vector<uint8_t>>{{3, 4, 3}, {2, 1, 2}}; // unser Pattern/Read - Vektor {G, T, G} {C, A, C}
+    auto chromosomes = std::vector<std::vector<uint8_t>>{{4, 4, 4, 4, 1, 2, 2, 2, 1, 2, 3, 4, 4, 4, 4}}; // unser  Text/Referenz - Vektor mit {T, T, T, T, A, C, C, C, A, C, G, T, T, T, T} 
+    
+    // ohne reduction
+    if(!reduced){
+        std::cout << "\nNot Reduced\n";
         auto chromosomes_with_complement = chromosomes; 
-        // hier wird einfach nur kopiert (optimierbar)
-        // endziel: aauuüüää (mit äs und üs als reverse strings)   
 
-        // ohne reduction
-        reverse_complement_generator(chromosomes);
-
-        //mit reduction
-        for (size_t i = 0; i < size(chromosomes); i++){ 
-            chromosomes[i] = reduction(chromosomes[i]); // einfach nur mit dieser extra for loop
-        }
-        reverse_generator(chromosomes);
-
-        {
-        std::cout << "\nBiFMIndex:\n";
-        auto index = BiFMIndex<String<Sigma>>{chromosomes, /*samplingRate*/16, /*threadNbr*/1};
+        chromosomes_with_complement = reverse_complement_generator(chromosomes_with_complement);
         
-        // ohne reduction 
-        auto queries = std::vector<std::vector<uint8_t>>{{3, 4, 3}, {2, 1, 2}}; // unser Pattern/Read - Vektor {G, T, G} {C, A, C}
-
-        // mit reduction
-        std::vector<std::vector<uint8_t>> reduced_queries;
-        for(std::vector<uint8_t> query : queries){
-            reduced_queries.push_back(reduction(query));
+        for(auto ref : chromosomes_with_complement){
+            fmt::print("{} \n", ref);
         }
+
+        std::cout << "\nBiFMIndex:\n";
+        auto index = BiFMIndex<String<Sigma>>{chromosomes_with_complement, /*samplingRate*/16, /*threadNbr*/1};
 
         search_backtracking::search(index, queries, 0, [&](size_t queryId, auto cursor, size_t errors) {
             (void) errors;
@@ -150,7 +142,90 @@ int main(int argc, char const* const* argv) {
                 fmt::print("chr/pos: {}/{}\n", chr, pos);
             }
         });
+    }
+
+    // mit reduction
+    if(reduced){
+        std::cout << "\nReduced\n";
+        auto reduced_chromosomes = chromosomes;
+
+        for (size_t i = 0; i < size(reduced_chromosomes); i++){ 
+            reduced_chromosomes[i] = reduction(reduced_chromosomes[i]); // einfach nur mit dieser extra for loop
         }
+        
+        reduced_chromosomes = reverse_generator(reduced_chromosomes);
+
+        std::vector<std::vector<uint8_t>> reduced_queries;
+        for(std::vector<uint8_t> query : queries){
+            reduced_queries.push_back(reduction(query));
+        }
+
+        std::cout << "\nBiFMIndex:\n";
+        auto reduced_index = BiFMIndex<String<Sigma>>{reduced_chromosomes, /*samplingRate*/16, /*threadNbr*/1};
+
+        search_backtracking::search(reduced_index, reduced_queries, 0, [&](size_t queryId, auto cursor, size_t errors) {
+            (void) errors;
+            fmt::print("found something {} {}\n", queryId, cursor.count()); // cursor.count() == range, range begriff wird verwechselt, print fmt kombiniert printf und stdcout
+            for (auto i : cursor) {  
+                auto [chr, pos] = reduced_index.locate(i); // cursor stuff
+                fmt::print("chr/pos: {}/{}\n", chr, pos);
+            }
+        });
+
+    }
+
+    else{
+    }
+    //     auto chromosomes = std::vector<std::vector<uint8_t>>{{4, 4, 4, 4, 1, 2, 2, 2, 1, 2, 3, 4, 4, 4, 4}}; // unser  Text/Referenz - Vektor mit {T, T, T, T, A, C, C, C, A, C, G, T, T, T, T} 
+    //     auto chromosomes_with_complement = chromosomes; 
+    //     auto reduced_chromosomes = chromosomes;
+    //     // endziel: aauuüüää (mit äs und üs als reverse strings)   
+
+    //     // ohne reduction
+    //     chromosomes_with_complement = reverse_complement_generator(chromosomes_with_complement);
+
+    //     //mit reduction
+    //     for (size_t i = 0; i < size(reduced_chromosomes); i++){ 
+    //         reduced_chromosomes[i] = reduction(reduced_chromosomes[i]); // einfach nur mit dieser extra for loop
+    //     }
+    //     reduced_chromosomes = reverse_generator(reduced_chromosomes);
+    //     for(auto ref : chromosomes_with_complement){
+    //         fmt::print("{} \n", ref);
+    //     }
+
+    //     {
+
+    //     std::cout << "\nBiFMIndex:\n";
+    //     auto index = BiFMIndex<String<Sigma>>{chromosomes_with_complement, /*samplingRate*/16, /*threadNbr*/1};
+    //     auto reduced_index = BiFMIndex<String<Sigma>>{reduced_chromosomes, /*samplingRate*/16, /*threadNbr*/1};
+
+    //     // ohne reduction 
+    //     auto queries = std::vector<std::vector<uint8_t>>{{3, 4, 3}, {2, 1, 2}}; // unser Pattern/Read - Vektor {G, T, G} {C, A, C}
+
+    //     // mit reduction
+    //     std::vector<std::vector<uint8_t>> reduced_queries;
+    //     for(std::vector<uint8_t> query : queries){
+    //         reduced_queries.push_back(reduction(query));
+    //     }
+
+    //     search_backtracking::search(index, queries, 0, [&](size_t queryId, auto cursor, size_t errors) {
+    //         (void) errors;
+    //         fmt::print("found something {} {}\n", queryId, cursor.count()); // cursor.count() == range, range begriff wird verwechselt, print fmt kombiniert printf und stdcout
+    //         for (auto i : cursor) {  
+    //             auto [chr, pos] = index.locate(i); // cursor stuff
+    //             fmt::print("chr/pos: {}/{}\n", chr, pos);
+    //         }
+    //     });
+
+    //     search_backtracking::search(reduced_index, reduced_queries, 0, [&](size_t queryId, auto cursor, size_t errors) {
+    //         (void) errors;
+    //         fmt::print("found something {} {}\n", queryId, cursor.count()); // cursor.count() == range, range begriff wird verwechselt, print fmt kombiniert printf und stdcout
+    //         for (auto i : cursor) {  
+    //             auto [chr, pos] = reduced_index.locate(i); // cursor stuff
+    //             fmt::print("chr/pos: {}/{}\n", chr, pos);
+    //         }
+    //     });
+    // }
     return 0; 
 }
 
