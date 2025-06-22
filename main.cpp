@@ -10,6 +10,7 @@
 #include <fmt/ranges.h>
 #include <iostream>
 #include <ranges>
+#include <sstream>
 
 using namespace fmindex_collection; // für die ganzen fmindex methode, fmindex_collection:: nicht notwendig 
 
@@ -112,11 +113,14 @@ std::vector<std::vector<uint8_t>> reverse_complement_generator(std::vector<std::
 //     return chromosomes;
 // }
 
-int main(int argc, char const* const* argv) {
-    (void)argc; // (void) sind nur für die strikten regeln des compilers
-    (void)argv;
+int main(int argc, char** argv []) {
+    // (void)argc; // (void) sind nur für die strikten regeln des compilers
+    // (void)argv;
     
-    bool reduced = true;
+    std::stringstream ss(argv[1]);
+    bool reduced;
+    ss >> std::boolalpha >> reduced;
+
     auto queries = std::vector<std::vector<uint8_t>>{{3, 4, 3}, {2, 1, 2}}; // unser Pattern/Read - Vektor {G, T, G} {C, A, C}
     auto chromosomes = std::vector<std::vector<uint8_t>>{{4, 4, 4, 4, 1, 2, 2, 2, 1, 2, 3, 4, 4, 4, 4}}; // unser  Text/Referenz - Vektor mit {T, T, T, T, A, C, C, C, A, C, G, T, T, T, T} 
     
@@ -176,61 +180,8 @@ int main(int argc, char const* const* argv) {
 
     else{
     }
-    //     auto chromosomes = std::vector<std::vector<uint8_t>>{{4, 4, 4, 4, 1, 2, 2, 2, 1, 2, 3, 4, 4, 4, 4}}; // unser  Text/Referenz - Vektor mit {T, T, T, T, A, C, C, C, A, C, G, T, T, T, T} 
-    //     auto chromosomes_with_complement = chromosomes; 
-    //     auto reduced_chromosomes = chromosomes;
-    //     // endziel: aauuüüää (mit äs und üs als reverse strings)   
-
-    //     // ohne reduction
-    //     chromosomes_with_complement = reverse_complement_generator(chromosomes_with_complement);
-
-    //     //mit reduction
-    //     for (size_t i = 0; i < size(reduced_chromosomes); i++){ 
-    //         reduced_chromosomes[i] = reduction(reduced_chromosomes[i]); // einfach nur mit dieser extra for loop
-    //     }
-    //     reduced_chromosomes = reverse_generator(reduced_chromosomes);
-    //     for(auto ref : chromosomes_with_complement){
-    //         fmt::print("{} \n", ref);
-    //     }
-
-    //     {
-
-    //     std::cout << "\nBiFMIndex:\n";
-    //     auto index = BiFMIndex<String<Sigma>>{chromosomes_with_complement, /*samplingRate*/16, /*threadNbr*/1};
-    //     auto reduced_index = BiFMIndex<String<Sigma>>{reduced_chromosomes, /*samplingRate*/16, /*threadNbr*/1};
-
-    //     // ohne reduction 
-    //     auto queries = std::vector<std::vector<uint8_t>>{{3, 4, 3}, {2, 1, 2}}; // unser Pattern/Read - Vektor {G, T, G} {C, A, C}
-
-    //     // mit reduction
-    //     std::vector<std::vector<uint8_t>> reduced_queries;
-    //     for(std::vector<uint8_t> query : queries){
-    //         reduced_queries.push_back(reduction(query));
-    //     }
-
-    //     search_backtracking::search(index, queries, 0, [&](size_t queryId, auto cursor, size_t errors) {
-    //         (void) errors;
-    //         fmt::print("found something {} {}\n", queryId, cursor.count()); // cursor.count() == range, range begriff wird verwechselt, print fmt kombiniert printf und stdcout
-    //         for (auto i : cursor) {  
-    //             auto [chr, pos] = index.locate(i); // cursor stuff
-    //             fmt::print("chr/pos: {}/{}\n", chr, pos);
-    //         }
-    //     });
-
-    //     search_backtracking::search(reduced_index, reduced_queries, 0, [&](size_t queryId, auto cursor, size_t errors) {
-    //         (void) errors;
-    //         fmt::print("found something {} {}\n", queryId, cursor.count()); // cursor.count() == range, range begriff wird verwechselt, print fmt kombiniert printf und stdcout
-    //         for (auto i : cursor) {  
-    //             auto [chr, pos] = reduced_index.locate(i); // cursor stuff
-    //             fmt::print("chr/pos: {}/{}\n", chr, pos);
-    //         }
-    //     });
-    // }
     return 0; 
 }
 
-// Aktueller Plan und Frage 
-// komplett getrennte funktionen, jeweils eine fürs reverse kompliment und einmal nur reverse lol
-// Patternreduktion
-// Patterntesting
+// Aktueller Plan und Fragen
 // Main mit 0-1 um reduction an und aus zu stellen
