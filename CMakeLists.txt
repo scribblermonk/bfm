@@ -12,6 +12,7 @@ find_package(OpenMP QUIET)
 include(cmake/CPM.cmake)
 CPMAddPackage("gh:SGSSGene/fmindex-collection#comp/awfmindex")
 CPMAddPackage("gh:fmtlib/fmt@11.2.0#11.2.0")
+CPMAddPackage("gh:SGSSGene/clice@1.1.1")
 
 
 add_executable(bfm
@@ -21,7 +22,5 @@ add_executable(bfm
 target_link_libraries(bfm
     fmindex-collection::fmindex-collection
     fmt::fmt
+    clice::clice
 )
-
-
-

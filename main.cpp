@@ -10,9 +10,16 @@
 #include <fmt/ranges.h>
 #include <iostream>
 #include <ranges>
-#include <sstream>
+#include <clice/clice.h>
 
 using namespace fmindex_collection; // für die ganzen fmindex methode, fmindex_collection:: nicht notwendig 
+
+    
+auto cliReduced = clice::Argument{ .args   = {"-r", "--reduced"},
+                                .desc   = "-r, --reduced switches to reduced mode",
+                                };
+
+auto cliHelp    = clice::Argument{ .args   = "--help", .desc   = "prints the help page", .cb     = [](){ std::cout << clice::generateHelp(); exit(0); }, .tags   = {"ignore-required"}, };
 
 constexpr size_t Sigma = 6; // Sigma steht für alphabetgröße
 
@@ -103,37 +110,37 @@ std::vector<std::vector<uint8_t>> reverse_complement_generator(std::vector<std::
     return chromosomes;
 }
 
-// std::vector<std::vector<uint8_t>> nameless(std::vector<std::vector<uint8_t>> chromosomes){
-//     for (size_t i = 0; i < size(chromosomes); i++){ // iterator durch chromosomes
-//         std::vector<uint8_t> temp = reverse_complement_generator(chromosomes[i]);
-//         chromosomes[i].push_back(5); // { a, b} -> { a, b, 5} // nicht vergessen in der Main möglicherweise einfach dran zu hängen
-//         chromosomes[i].insert(chromosomes[i].end(), temyp.begin(), temp.end());  // { a, b, 5} -> { a, b, 5, b, a}
-//         fmt::print("{} \n", chromosomes[i]);
-//     }
-//     return chromosomes;
-// }
+int main(int argc, char const* const* argv) {
+    (void)argc; // (void) sind nur für die strikten regeln des compilers
+    (void)argv;
 
-int main(int argc, char** argv []) {
-    // (void)argc; // (void) sind nur für die strikten regeln des compilers
-    // (void)argv;
+    bool reduced = true;
+
+    if (auto failed = clice::parse(argc, argv); failed) {
+        std::cerr << "parsing failed: " << *failed << "\n";
+        return 1;
+    }
+
+    // use it as a boolean to check if it was set
+    if (!cliReduced) {
+        //std::cout << "-r was not set on the command line\n";
+        reduced = false;
+    }
     
-    std::stringstream ss(argv[1]);
-    bool reduced;
-    ss >> std::boolalpha >> reduced;
-
     auto queries = std::vector<std::vector<uint8_t>>{{3, 4, 3}, {2, 1, 2}}; // unser Pattern/Read - Vektor {G, T, G} {C, A, C}
     auto chromosomes = std::vector<std::vector<uint8_t>>{{4, 4, 4, 4, 1, 2, 2, 2, 1, 2, 3, 4, 4, 4, 4}}; // unser  Text/Referenz - Vektor mit {T, T, T, T, A, C, C, C, A, C, G, T, T, T, T} 
     
     // ohne reduction
     if(!reduced){
-        std::cout << "\nNot Reduced\n";
+        std::cout << "Not Reduced\n";
         auto chromosomes_with_complement = chromosomes; 
+        bool reduced = false;
 
         chromosomes_with_complement = reverse_complement_generator(chromosomes_with_complement);
         
-        for(auto ref : chromosomes_with_complement){
-            fmt::print("{} \n", ref);
-        }
+        // for(auto ref : chromosomes_with_complement){
+        //     fmt::print("{} \n", ref);
+        // } debugging
 
         std::cout << "\nBiFMIndex:\n";
         auto index = BiFMIndex<String<Sigma>>{chromosomes_with_complement, /*samplingRate*/16, /*threadNbr*/1};
@@ -150,7 +157,7 @@ int main(int argc, char** argv []) {
 
     // mit reduction
     if(reduced){
-        std::cout << "\nReduced\n";
+        std::cout << "Reduced\n";
         auto reduced_chromosomes = chromosomes;
 
         for (size_t i = 0; i < size(reduced_chromosomes); i++){ 
@@ -179,7 +186,9 @@ int main(int argc, char** argv []) {
     }
 
     else{
+
     }
+
     return 0; 
 }
 
