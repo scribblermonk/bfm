@@ -11,6 +11,7 @@
 #include <iostream>
 #include <ranges>
 #include <clice/clice.h>
+#include <ivio/ivio.h>
 
 using namespace fmindex_collection; //for all of the fmindex methods
     
@@ -42,6 +43,34 @@ auto loadIndex(std::filesystem::path _fileName) {
     archive(index);
     return index;
 }
+
+std::vector<uint8_t> letter_to_number(std::string_view seq){ // string_view for minimal copy 
+    std::vector<uint8_t> num_seq = {};
+    for(auto letter : seq)
+    {
+        switch(i) { //
+            case 'A':
+            reduced.push_back(1);
+            break;
+
+            case 'C':
+            reduced.push_back(2);
+            break;
+
+            case 'G':
+            reduced.push_back(3);
+            break;
+
+            case 'T':
+            reduced.push_back(4);
+            break;
+
+            default:
+            reduced.push_back(1) //erstmal A wollen aber schön mit eigentlich weitermachen
+
+        }
+    }
+} 
 
 std::vector<uint8_t> reduction(std::vector<uint8_t> const& ref){ // {1,4,1,3,2} -> {1,1,1,2,2}
     std::vector<uint8_t> reduced = {}; 
@@ -75,7 +104,7 @@ std::vector<std::vector<uint8_t>> reverse_generator(std::vector<std::vector<uint
     return chromosomes;
 }
 
-std::vector<std::vector<uint8_t>> reverse_complement_generator(std::vector<std::vector<uint8_t>> chromosomes){    
+std::vector<std::vector<uint8_t>> reverse_complement_generator(std::vector<std::vector<uint8_t>> chromosomes){  // {{1,4,1,3,2}} ->  {{1,4,1,3,2,0,2,3,1,4,1}}
     
     for(std::vector<uint8_t>& ref : chromosomes){    // call by reference critical for functionality
         std::vector<uint8_t> reverse_complement = {}; 
@@ -115,21 +144,31 @@ int main(int argc, char const* const* argv) {
     (void)argc; // (void) sind nur für die strikten regeln des compilers
     (void)argv;
 
-    bool reduced = true;
-
     if (auto failed = clice::parse(argc, argv); failed) {
         std::cerr << "parsing failed: " << *failed << "\n";
         return 1;
     }
     
-    // use it as a boolean to check if it was set
-    if (!cliReduced) {
-        //std::cout << "-r was not set on the command line\n";
-        reduced = false;
-    }
-    
+    bool reduced = cliReduced; 
+
     auto queries = std::vector<std::vector<uint8_t>>{{3, 4, 3}, {2, 1, 2}}; // unser Pattern/Read - Vektor {G, T, G} {C, A, C}
+    //fasta input Queries
+    auto inputQueries = std::filesystem::path{"../quer.txt"};
+    auto quer_reader = ivio::fasta::reader{{.input = inputQueries}};
+    for (auto record_view : quer_reader) {
+        //queries.push_back(record_view.seq);
+    }
+
     auto chromosomes = std::vector<std::vector<uint8_t>>{{4, 4, 4, 4, 1, 2, 2, 2, 1, 2, 3, 4, 4, 4, 4}}; // unser  Text/Referenz - Vektor mit {T, T, T, T, A, C, C, C, A, C, G, T, T, T, T} 
+    //fasta input Reference
+    auto inputRef = std::filesystem::path{"../ref.txt"};
+    auto ref_reader = ivio::fasta::reader{{.input = inputRef}};
+    for (auto record_view : ref_reader) {
+        //chromosomes.push_back(record_view.seq);
+    }
+
+    
+    
     
     // ohne reduction
     if(!reduced){
@@ -188,6 +227,3 @@ int main(int argc, char const* const* argv) {
 
     return 0; 
 }
-
-// Aktueller Plan und Fragen
-// Main mit 0-1 um reduction an und aus zu stellen

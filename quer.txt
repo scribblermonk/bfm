@@ -1,0 +1,8 @@
+>Query1
+ACG
+>Query2
+TGC
+>Query3
+CCG
+>Query4
+CGT
