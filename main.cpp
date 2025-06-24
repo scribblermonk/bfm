@@ -12,28 +12,29 @@
 #include <ranges>
 #include <clice/clice.h>
 
-using namespace fmindex_collection; // für die ganzen fmindex methode, fmindex_collection:: nicht notwendig 
-
+using namespace fmindex_collection; //for all of the fmindex methods
     
 auto cliReduced = clice::Argument{ .args   = {"-r", "--reduced"},
-                                .desc   = "-r, --reduced switches to reduced mode",
+                                .desc   = "-r, --reduced enter reduced mode",
                                 };
 
 auto cliHelp    = clice::Argument{ .args   = "--help", .desc   = "prints the help page", .cb     = [](){ std::cout << clice::generateHelp(); exit(0); }, .tags   = {"ignore-required"}, };
+// generates help pa
 
-constexpr size_t Sigma = 6; // Sigma steht für alphabetgröße
+constexpr size_t Sigma = 5; // Sigma == Alphabet size
+constexpr size_t reduced_Sigma = 3; // reduced Sigma == reduced alphabetsize
 
-template <size_t Sigma>
-using String = string::InterleavedBitvector16<Sigma>; // häh was ist das? 
+template <size_t T_Sigma>
+using String = string::InterleavedBitvector16<T_Sigma>; // template/"function call"
 
-template <typename Index> // zur fütterung mit daten? die ersten beiden templates muss ich nicht verstehen
-void saveIndex(Index const& _index, std::filesystem::path _fileName) {
+template <typename Index> // saves index
+void saveIndex(Index const& _index, std::filesystem::path _fileName) { 
     auto ofs     = std::ofstream(_fileName, std::ios::binary);
     auto archive = cereal::BinaryOutputArchive{ofs};
     archive(_index);
 }
 
-template <typename Index>
+template <typename Index> // loads index
 auto loadIndex(std::filesystem::path _fileName) {
     auto ifs     = std::ifstream(_fileName, std::ios::binary);
     auto archive = cereal::BinaryInputArchive{ifs};
@@ -42,12 +43,12 @@ auto loadIndex(std::filesystem::path _fileName) {
     return index;
 }
 
-std::vector<uint8_t> reduction(std::vector<uint8_t> const& ref){
+std::vector<uint8_t> reduction(std::vector<uint8_t> const& ref){ // {1,4,1,3,2} -> {1,1,1,2,2}
     std::vector<uint8_t> reduced = {}; 
     reduced.reserve(size(ref)); 
     for (const uint8_t& i: ref)
         {
-        switch(i) {
+        switch(i) { // basically a look up table 
                 case 3:
                 reduced.push_back(2);
                 break;
@@ -63,11 +64,11 @@ std::vector<uint8_t> reduction(std::vector<uint8_t> const& ref){
     return reduced;
 }
 
-std::vector<std::vector<uint8_t>> reverse_generator(std::vector<std::vector<uint8_t>> chromosomes){
+std::vector<std::vector<uint8_t>> reverse_generator(std::vector<std::vector<uint8_t>> chromosomes){ // {1,1,1,2,2} -> {1,1,1,2,2,0,2,2,1,1,1} 
     for(std::vector<uint8_t>& ref : chromosomes){
         std::vector<uint8_t> reverse_ref = ref;
         std::reverse(reverse_ref.begin(), reverse_ref.end());
-        ref.push_back(5);
+        ref.push_back(0); 
         ref.insert(ref.end(), reverse_ref.begin(), reverse_ref.end());
         // fmt::print("{} \n", ref); //debugging 
     }
@@ -80,7 +81,7 @@ std::vector<std::vector<uint8_t>> reverse_complement_generator(std::vector<std::
         std::vector<uint8_t> reverse_complement = {}; 
         reverse_complement.reserve(size(ref)); 
 
-        for (const uint8_t& i: ref | std::views::reverse)
+        for (const uint8_t& i: ref | std::views::reverse) // fancy method to generate revers
         { 
             switch(i) {
                 case 1:
@@ -103,8 +104,8 @@ std::vector<std::vector<uint8_t>> reverse_complement_generator(std::vector<std::
                 fmt::print("count error \n");
             }
         }  
-        ref.push_back(5);
-        ref.insert(ref.end(), reverse_complement.begin(), reverse_complement.end());  // { a, b, 5} -> { a, b, 5, b, a}
+        ref.push_back(0);
+        ref.insert(ref.end(), reverse_complement.begin(), reverse_complement.end());  // { a, b, 0} -> { a, b, 0, b, a}
         //fmt::print("{} \n", ref); //debugging 
     }
     return chromosomes;
@@ -120,7 +121,7 @@ int main(int argc, char const* const* argv) {
         std::cerr << "parsing failed: " << *failed << "\n";
         return 1;
     }
-
+    
     // use it as a boolean to check if it was set
     if (!cliReduced) {
         //std::cout << "-r was not set on the command line\n";
@@ -147,7 +148,7 @@ int main(int argc, char const* const* argv) {
 
         search_backtracking::search(index, queries, 0, [&](size_t queryId, auto cursor, size_t errors) {
             (void) errors;
-            fmt::print("found something {} {}\n", queryId, cursor.count()); // cursor.count() == range, range begriff wird verwechselt, print fmt kombiniert printf und stdcout
+            fmt::print("found something {} {}\n", queryId, cursor.count()); // cursor.count() == range, range term is confusing, print fmt combines printf and stdcout
             for (auto i : cursor) {  
                 auto [chr, pos] = index.locate(i); // cursor stuff
                 fmt::print("chr/pos: {}/{}\n", chr, pos);
@@ -161,7 +162,7 @@ int main(int argc, char const* const* argv) {
         auto reduced_chromosomes = chromosomes;
 
         for (size_t i = 0; i < size(reduced_chromosomes); i++){ 
-            reduced_chromosomes[i] = reduction(reduced_chromosomes[i]); // einfach nur mit dieser extra for loop
+            reduced_chromosomes[i] = reduction(reduced_chromosomes[i]); // extraloop 
         }
         
         reduced_chromosomes = reverse_generator(reduced_chromosomes);
@@ -172,7 +173,7 @@ int main(int argc, char const* const* argv) {
         }
 
         std::cout << "\nBiFMIndex:\n";
-        auto reduced_index = BiFMIndex<String<Sigma>>{reduced_chromosomes, /*samplingRate*/16, /*threadNbr*/1};
+        auto reduced_index = BiFMIndex<String<reduced_Sigma>>{reduced_chromosomes, /*samplingRate*/16, /*threadNbr*/1};
 
         search_backtracking::search(reduced_index, reduced_queries, 0, [&](size_t queryId, auto cursor, size_t errors) {
             (void) errors;
@@ -182,10 +183,6 @@ int main(int argc, char const* const* argv) {
                 fmt::print("chr/pos: {}/{}\n", chr, pos);
             }
         });
-
-    }
-
-    else{
 
     }
 
