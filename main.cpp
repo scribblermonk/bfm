@@ -20,7 +20,7 @@ auto cliReduced = clice::Argument{ .args   = {"-r", "--reduced"},
                                 };
 
 auto cliHelp    = clice::Argument{ .args   = "--help", .desc   = "prints the help page", .cb     = [](){ std::cout << clice::generateHelp(); exit(0); }, .tags   = {"ignore-required"}, };
-// generates help pa
+// generates help page
 
 constexpr size_t Sigma = 5; // Sigma == Alphabet size
 constexpr size_t reduced_Sigma = 3; // reduced Sigma == reduced alphabetsize
@@ -48,28 +48,28 @@ std::vector<uint8_t> letter_to_number(std::string_view seq){ // string_view for 
     std::vector<uint8_t> num_seq = {};
     for(auto letter : seq)
     {
-        switch(i) { //
+        switch(letter) { 
             case 'A':
-            reduced.push_back(1);
+            num_seq.push_back(1);
             break;
 
             case 'C':
-            reduced.push_back(2);
+            num_seq.push_back(2);
             break;
 
             case 'G':
-            reduced.push_back(3);
+            num_seq.push_back(3);
             break;
 
             case 'T':
-            reduced.push_back(4);
+            num_seq.push_back(4);
             break;
 
             default:
-            reduced.push_back(1) //erstmal A wollen aber schön mit eigentlich weitermachen
-
+            num_seq.push_back(1); //erstmal A wollen aber schön mit eigentlich weitermachen rnd int  
         }
     }
+    return num_seq;
 } 
 
 std::vector<uint8_t> reduction(std::vector<uint8_t> const& ref){ // {1,4,1,3,2} -> {1,1,1,2,2}
@@ -151,24 +151,21 @@ int main(int argc, char const* const* argv) {
     
     bool reduced = cliReduced; 
 
-    auto queries = std::vector<std::vector<uint8_t>>{{3, 4, 3}, {2, 1, 2}}; // unser Pattern/Read - Vektor {G, T, G} {C, A, C}
+    auto queries = std::vector<std::vector<uint8_t>>{}; // {3, 4, 3}, {2, 1, 2} unser Pattern/Read - Vektor {G, T, G} {C, A, C}
     //fasta input Queries
     auto inputQueries = std::filesystem::path{"../quer.txt"};
     auto quer_reader = ivio::fasta::reader{{.input = inputQueries}};
     for (auto record_view : quer_reader) {
-        //queries.push_back(record_view.seq);
+        queries.push_back(letter_to_number(record_view.seq)); //pushback of converted text string 
     }
 
-    auto chromosomes = std::vector<std::vector<uint8_t>>{{4, 4, 4, 4, 1, 2, 2, 2, 1, 2, 3, 4, 4, 4, 4}}; // unser  Text/Referenz - Vektor mit {T, T, T, T, A, C, C, C, A, C, G, T, T, T, T} 
+    auto chromosomes = std::vector<std::vector<uint8_t>>{}; // {4, 4, 4, 4, 1, 2, 2, 2, 1, 2, 3, 4, 4, 4, 4} unser  Text/Referenz - Vektor mit {T, T, T, T, A, C, C, C, A, C, G, T, T, T, T} 
     //fasta input Reference
     auto inputRef = std::filesystem::path{"../ref.txt"};
     auto ref_reader = ivio::fasta::reader{{.input = inputRef}};
     for (auto record_view : ref_reader) {
-        //chromosomes.push_back(record_view.seq);
+        chromosomes.push_back(letter_to_number(record_view.seq));
     }
-
-    
-    
     
     // ohne reduction
     if(!reduced){
@@ -180,17 +177,16 @@ int main(int argc, char const* const* argv) {
         
         // for(auto ref : chromosomes_with_complement){
         //     fmt::print("{} \n", ref);
-        // } debugging
+        //  } // debugging
 
         std::cout << "\nBiFMIndex:\n";
         auto index = BiFMIndex<String<Sigma>>{chromosomes_with_complement, /*samplingRate*/16, /*threadNbr*/1};
 
         search_backtracking::search(index, queries, 0, [&](size_t queryId, auto cursor, size_t errors) {
             (void) errors;
-            fmt::print("found something {} {}\n", queryId, cursor.count()); // cursor.count() == range, range term is confusing, print fmt combines printf and stdcout
             for (auto i : cursor) {  
                 auto [chr, pos] = index.locate(i); // cursor stuff
-                fmt::print("chr/pos: {}/{}\n", chr, pos);
+                fmt::print("query_index/chromosome_index/position_of_hit: {}/{}/{}\n", queryId, chr, pos);  // cursor.count() == range, range term is confusing, print fmt combines printf and stdcout
             }
         });
     }
@@ -216,13 +212,11 @@ int main(int argc, char const* const* argv) {
 
         search_backtracking::search(reduced_index, reduced_queries, 0, [&](size_t queryId, auto cursor, size_t errors) {
             (void) errors;
-            fmt::print("found something {} {}\n", queryId, cursor.count()); // cursor.count() == range, range begriff wird verwechselt, print fmt kombiniert printf und stdcout
             for (auto i : cursor) {  
                 auto [chr, pos] = reduced_index.locate(i); // cursor stuff
-                fmt::print("chr/pos: {}/{}\n", chr, pos);
+                fmt::print("query_index/chromosome_index/position_of_hit: {}/{}/{}\n", queryId, chr, pos);  // cursor.count() == range, range term is confusing, print fmt combines printf and stdcout
             }
         });
-
     }
 
     return 0; 
