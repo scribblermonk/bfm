@@ -15,9 +15,21 @@
 
 using namespace fmindex_collection; //for all of the fmindex methods
     
-auto cliReduced = clice::Argument{ .args   = {"-r", "--reduced"},
-                                .desc   = "-r, --reduced enter reduced mode",
+auto cliReduced = clice::Argument{ .args   = {"-r", "--reduced"},                      
+                                .desc   = "enter reduced mode",
                                 };
+
+auto cliQuery = clice::Argument{ .args = {"-q", "--queries"},
+                                 .desc = "input query for fasta file location",
+                                 .value = std::filesystem::path{},
+                                 .tags = {} //"required"
+                            };
+
+auto cliRef = clice::Argument{ .args = {"-ref", "--reference"},
+                               .desc = "input reference fasta file location",
+                               .value = std::filesystem::path{},
+                               .tags = {} // "requird"
+                            };
 
 auto cliHelp    = clice::Argument{ .args   = "--help", .desc   = "prints the help page", .cb     = [](){ std::cout << clice::generateHelp(); exit(0); }, .tags   = {"ignore-required"}, };
 // generates help page
@@ -44,6 +56,7 @@ auto loadIndex(std::filesystem::path _fileName) {
     return index;
 }
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 std::vector<uint8_t> letter_to_number(std::string_view seq){ // string_view for minimal copy 
     std::vector<uint8_t> num_seq = {};
     for(auto letter : seq)
@@ -71,7 +84,7 @@ std::vector<uint8_t> letter_to_number(std::string_view seq){ // string_view for 
     }
     return num_seq;
 } 
-
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 std::vector<uint8_t> reduction(std::vector<uint8_t> const& ref){ // {1,4,1,3,2} -> {1,1,1,2,2}
     std::vector<uint8_t> reduced = {}; 
     reduced.reserve(size(ref)); 
@@ -92,7 +105,7 @@ std::vector<uint8_t> reduction(std::vector<uint8_t> const& ref){ // {1,4,1,3,2} 
         }  
     return reduced;
 }
-
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 std::vector<std::vector<uint8_t>> reverse_generator(std::vector<std::vector<uint8_t>> chromosomes){ // {1,1,1,2,2} -> {1,1,1,2,2,0,2,2,1,1,1} 
     for(std::vector<uint8_t>& ref : chromosomes){
         std::vector<uint8_t> reverse_ref = ref;
@@ -103,7 +116,7 @@ std::vector<std::vector<uint8_t>> reverse_generator(std::vector<std::vector<uint
     }
     return chromosomes;
 }
-
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 std::vector<std::vector<uint8_t>> reverse_complement_generator(std::vector<std::vector<uint8_t>> chromosomes){  // {{1,4,1,3,2}} ->  {{1,4,1,3,2,0,2,3,1,4,1}}
     
     for(std::vector<uint8_t>& ref : chromosomes){    // call by reference critical for functionality
@@ -139,10 +152,10 @@ std::vector<std::vector<uint8_t>> reverse_complement_generator(std::vector<std::
     }
     return chromosomes;
 }
-
-int main(int argc, char const* const* argv) {
-    (void)argc; // (void) sind nur für die strikten regeln des compilers
-    (void)argv;
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+int main(int argc, char const* const* argv){
+    (void)argc; // (void) for strict rules of the compiler
+    (void)argv; 
 
     std::ofstream hit_log;
     hit_log.open("../hit_log.txt");
@@ -156,7 +169,7 @@ int main(int argc, char const* const* argv) {
 
     auto queries = std::vector<std::vector<uint8_t>>{}; // {3, 4, 3}, {2, 1, 2} unser Pattern/Read - Vektor {G, T, G} {C, A, C}
     //fasta input Queries
-    auto inputQueries = std::filesystem::path{"../quer.txt"};
+    auto inputQueries = *cliQuery;
     auto quer_reader = ivio::fasta::reader{{.input = inputQueries}};
     for (auto record_view : quer_reader) {
         queries.push_back(letter_to_number(record_view.seq)); //pushback of converted text string 
@@ -164,7 +177,7 @@ int main(int argc, char const* const* argv) {
 
     auto chromosomes = std::vector<std::vector<uint8_t>>{}; // {4, 4, 4, 4, 1, 2, 2, 2, 1, 2, 3, 4, 4, 4, 4} unser  Text/Referenz - Vektor mit {T, T, T, T, A, C, C, C, A, C, G, T, T, T, T} 
     //fasta input Reference
-    auto inputRef = std::filesystem::path{"../ref.txt"};
+    auto inputRef = *cliRef;
     auto ref_reader = ivio::fasta::reader{{.input = inputRef}};
     for (auto record_view : ref_reader) {
         chromosomes.push_back(letter_to_number(record_view.seq));
@@ -208,7 +221,7 @@ int main(int argc, char const* const* argv) {
         for(std::vector<uint8_t> query : queries){
             reduced_queries.push_back(reduction(query));
         }
-        
+
         auto reduced_index = BiFMIndex<String<reduced_Sigma>>{reduced_chromosomes, /*samplingRate*/16, /*threadNbr*/1};
 
         search_backtracking::search(reduced_index, reduced_queries, 0, [&](size_t queryId, auto cursor, size_t errors) {
@@ -219,5 +232,7 @@ int main(int argc, char const* const* argv) {
             }
         });
     }
+
     return 0; 
 }
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
