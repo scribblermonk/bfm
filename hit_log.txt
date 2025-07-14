@@ -1,0 +1,8 @@
+query_index/chromosome_index/position_of_hit: 0/0/23
+query_index/chromosome_index/position_of_hit: 0/0/31
+query_index/chromosome_index/position_of_hit: 0/0/0
+query_index/chromosome_index/position_of_hit: 1/0/3
+query_index/chromosome_index/position_of_hit: 2/0/6
+query_index/chromosome_index/position_of_hit: 3/0/32
+query_index/chromosome_index/position_of_hit: 3/0/9
+query_index/chromosome_index/position_of_hit: 3/0/1
