@@ -22,13 +22,13 @@ auto cliReduced = clice::Argument{ .args   = {"-r", "--reduced"},
 auto cliQuery = clice::Argument{ .args = {"-q", "--queries"},
                                  .desc = "input query for fasta file location",
                                  .value = std::filesystem::path{},
-                                 .tags = {} //"required"
+                                 .tags = {"required"} //"required"
                             };
 
 auto cliRef = clice::Argument{ .args = {"-ref", "--reference"},
                                .desc = "input reference fasta file location",
                                .value = std::filesystem::path{},
-                               .tags = {} // "requird"
+                               .tags = {"required"} // "requird"
                             };
 
 auto cliHelp    = clice::Argument{ .args   = "--help", .desc   = "prints the help page", .cb     = [](){ std::cout << clice::generateHelp(); exit(0); }, .tags   = {"ignore-required"}, };
@@ -79,7 +79,7 @@ std::vector<uint8_t> letter_to_number(std::string_view seq){ // string_view for 
             break;
 
             default:
-            num_seq.push_back(1); //erstmal A wollen aber schön mit eigentlich weitermachen rnd int  
+            num_seq.push_back(rand() % 4 + 1); // random letter input when unclear 
         }
     }
     return num_seq;
@@ -119,7 +119,7 @@ std::vector<std::vector<uint8_t>> reverse_generator(std::vector<std::vector<uint
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 std::vector<std::vector<uint8_t>> reverse_complement_generator(std::vector<std::vector<uint8_t>> chromosomes){  // {{1,4,1,3,2}} ->  {{1,4,1,3,2,0,2,3,1,4,1}}
     
-    for(std::vector<uint8_t>& ref : chromosomes){    // call by reference critical for functionality
+    for(std::vector<uint8_t>& ref : c/home/mi/nikov76/Dokumente/bfm/quer.txthromosomes){    // call by reference critical for functionality
         std::vector<uint8_t> reverse_complement = {}; 
         reverse_complement.reserve(size(ref)); 
 
@@ -156,6 +156,8 @@ std::vector<std::vector<uint8_t>> reverse_complement_generator(std::vector<std::
 int main(int argc, char const* const* argv){
     (void)argc; // (void) for strict rules of the compiler
     (void)argv; 
+
+    srand(0); // seeding rand
 
     std::ofstream hit_log;
     hit_log.open("../hit_log.txt");
@@ -236,5 +238,3 @@ int main(int argc, char const* const* argv){
     return 0; 
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-// hopped on server ;)) 
