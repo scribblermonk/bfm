@@ -19,6 +19,12 @@ auto cliReduced = clice::Argument{ .args   = {"-r", "--reduced"},
                                 .desc   = "enter reduced mode",
                                 };
 
+auto cliThreads = clice::Argument{ .args = {"-t", "--threads"},
+                                .desc = "enter thread count",
+                                .value = size_t{},
+                                .tags = {"required"} //"required"
+                            };
+
 auto cliQuery = clice::Argument{ .args = {"-q", "--queries"},
                                  .desc = "input query for fasta file location",
                                  .value = std::filesystem::path{},
@@ -28,7 +34,7 @@ auto cliQuery = clice::Argument{ .args = {"-q", "--queries"},
 auto cliRef = clice::Argument{ .args = {"-ref", "--reference"},
                                .desc = "input reference fasta file location",
                                .value = std::filesystem::path{},
-                               .tags = {"required"} // "requird"
+                               .tags = {"required"} // "required"
                             };
 
 auto cliHelp    = clice::Argument{ .args   = "--help", .desc   = "prints the help page", .cb     = [](){ std::cout << clice::generateHelp(); exit(0); }, .tags   = {"ignore-required"}, };
@@ -64,6 +70,7 @@ std::vector<uint8_t> letter_to_number(std::string_view seq){ // string_view for 
         switch(letter) { 
             case 'A':
             num_seq.push_back(1);
+
             break;
 
             case 'C':
@@ -118,8 +125,7 @@ std::vector<std::vector<uint8_t>> reverse_generator(std::vector<std::vector<uint
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 std::vector<std::vector<uint8_t>> reverse_complement_generator(std::vector<std::vector<uint8_t>> chromosomes){  // {{1,4,1,3,2}} ->  {{1,4,1,3,2,0,2,3,1,4,1}}
-    
-    for(std::vector<uint8_t>& ref : c/home/mi/nikov76/Dokumente/bfm/quer.txthromosomes){    // call by reference critical for functionality
+    for(std::vector<uint8_t>& ref : chromosomes){    // call by reference critical for functionality
         std::vector<uint8_t> reverse_complement = {}; 
         reverse_complement.reserve(size(ref)); 
 
@@ -168,6 +174,7 @@ int main(int argc, char const* const* argv){
     }
     
     bool reduced = cliReduced; 
+    size_t threads = cliThreads;
 
     auto queries = std::vector<std::vector<uint8_t>>{}; // {3, 4, 3}, {2, 1, 2} unser Pattern/Read - Vektor {G, T, G} {C, A, C}
     //fasta input Queries
@@ -197,7 +204,7 @@ int main(int argc, char const* const* argv){
         //     fmt::print("{} \n", ref);
         //  } // debugging
 
-        auto index = BiFMIndex<String<Sigma>>{chromosomes_with_complement, /*samplingRate*/16, /*threadNbr*/1};
+        auto index = BiFMIndex<String<Sigma>>{chromosomes_with_complement, /*samplingRate*/16, /*threadNbr*/threads};
 
         search_backtracking::search(index, queries, 0, [&](size_t queryId, auto cursor, size_t errors) {
             (void) errors;
@@ -224,7 +231,7 @@ int main(int argc, char const* const* argv){
             reduced_queries.push_back(reduction(query));
         }
 
-        auto reduced_index = BiFMIndex<String<reduced_Sigma>>{reduced_chromosomes, /*samplingRate*/16, /*threadNbr*/1};
+        auto reduced_index = BiFMIndex<String<reduced_Sigma>>{reduced_chromosomes, /*samplingRate*/16, /*threadNbr*/ threads};
 
         search_backtracking::search(reduced_index, reduced_queries, 0, [&](size_t queryId, auto cursor, size_t errors) {
             (void) errors;
