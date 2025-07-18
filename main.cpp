@@ -37,7 +37,7 @@ auto cliRef = clice::Argument{ .args = {"-ref", "--reference"},
                                .tags = {"required"} // "required"
                             };
 
-auto cliHelp    = clice::Argument{ .args   = "--help", .desc   = "prints the help page", .cb     = [](){ std::cout << clice::generateHelp(); exit(0); }, .tags   = {"ignore-required"}, };
+auto cliHelp = clice::Argument{ .args   = "--help", .desc   = "prints the help page", .cb     = [](){ std::cout << clice::generateHelp(); exit(0); }, .tags   = {"ignore-required"}, };
 // generates help page
 
 constexpr size_t Sigma = 5; // Sigma == Alphabet size
@@ -70,7 +70,6 @@ std::vector<uint8_t> letter_to_number(std::string_view seq){ // string_view for 
         switch(letter) { 
             case 'A':
             num_seq.push_back(1);
-
             break;
 
             case 'C':
@@ -149,7 +148,7 @@ std::vector<std::vector<uint8_t>> reverse_complement_generator(std::vector<std::
                 break;
 
                 default:
-                fmt::print("count error \n");
+                fmt::print("count 1. cmake .. -DCMAKE_BUILD_TYPE=Debugerror \n");
             }
         }  
         ref.push_back(0);
@@ -204,20 +203,38 @@ int main(int argc, char const* const* argv){
         //     fmt::print("{} \n", ref);
         //  } // debugging
 
-        auto index = BiFMIndex<String<Sigma>>{chromosomes_with_complement, /*samplingRate*/16, /*threadNbr*/threads};
+        auto index = BiFMIndex<String<Sigma>>{chromosomes_with_complement, /*samplingRate*/16, /*threadNbr*/ threads};
+        saveIndex(index, "../_fm_hg38");
 
-        search_backtracking::search(index, queries, 0, [&](size_t queryId, auto cursor, size_t errors) {
+        if(std::filesystem::exists("../_fm_hg38_r") == 0){
+            auto index = BiFMIndex<String<Sigma>>{chromosomes_with_complement, /*samplingRate*/16, /*threadNbr*/ threads};
+            saveIndex(index, "../_fm_hg38");
+
+            search_backtracking::search(index, queries, 0, [&](size_t queryId, auto cursor, size_t errors) {
             (void) errors;
             for (auto i : cursor) {  
                 auto [chr, pos] = index.locate(i); // cursor stuff
                  hit_log << fmt::format("query_index/chromosome_index/position_of_hit: {}/{}/{}\n", queryId, chr, pos);  // cursor.count() == range, range term is confusing, print fmt combines printf and stdcout
             }
         });
+        }
+        else{
+            auto index = loadIndex<BiFMIndex<String<Sigma>>>("../_fm_hg38");
+
+            search_backtracking::search(index, queries, 0, [&](size_t queryId, auto cursor, size_t errors) {
+            (void) errors;
+            for (auto i : cursor) {  
+                auto [chr, pos] = index.locate(i); // cursor stuff
+                hit_log << fmt::format("query_index/chromosome_index/position_of_hit: {}/{}/{}\n", queryId, chr, pos);  // cursor.count() == range, range term is confusing, print fmt combines printf and stdcout
+            }
+        });
+        }
+
     }
 
     // mit reduction
     if(reduced){
-        std::cout << "running reduced BiFMindex 2.0 (reduced)\n";
+        std::cout << "running reduced BiFMindReferences\n";
         auto reduced_chromosomes = chromosomes;
 
         for (size_t i = 0; i < size(reduced_chromosomes); i++){ 
@@ -231,15 +248,32 @@ int main(int argc, char const* const* argv){
             reduced_queries.push_back(reduction(query));
         }
 
+        //auto reduced_index;
+
+        if(std::filesystem::exists("../_fm_hg38_r") == 0){
         auto reduced_index = BiFMIndex<String<reduced_Sigma>>{reduced_chromosomes, /*samplingRate*/16, /*threadNbr*/ threads};
+        saveIndex(reduced_index, "../fm_hg38_r");
 
         search_backtracking::search(reduced_index, reduced_queries, 0, [&](size_t queryId, auto cursor, size_t errors) {
-            (void) errors;
-            for (auto i : cursor) {  
-                auto [chr, pos] = reduced_index.locate(i); // cursor stuff
-                hit_log << fmt::format("query_index/chromosome_index/position_of_hit: {}/{}/{}\n", queryId, chr, pos);  // cursor.count() == range, range term is confusing, print fmt combines printf and stdcout
-            }
+        (void) errors; 
+        for (auto i : cursor) {  
+            auto [chr, pos] = reduced_index.locate(i); // cursor stuff
+            hit_log << fmt::format("query_index/chromosome_index/position_of_hit: {}/{}/{}\n", queryId, chr, pos);  // cursor.count() == range, range term is confusing, print fmt combines printf and stdcout
+        }
         });
+        }
+        
+        else{
+        auto reduced_index = loadIndex<BiFMIndex<String<reduced_Sigma>>>("../fm_hg38_r");
+
+        search_backtracking::search(reduced_index, reduced_queries, 0, [&](size_t queryId, auto cursor, size_t errors) {
+        (void) errors;
+        for (auto i : cursor) {  
+            auto [chr, pos] = reduced_index.locate(i); // cursor stuff
+            hit_log << fmt::format("query_index/chromosome_index/position_of_hit: {}/{}/{}\n", queryId, chr, pos);  // cursor.count() == range, range term is confusing, print fmt combines printf and stdcout
+        }
+        });
+        }
     }
 
     return 0; 
