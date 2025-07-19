@@ -148,7 +148,7 @@ std::vector<std::vector<uint8_t>> reverse_complement_generator(std::vector<std::
                 break;
 
                 default:
-                fmt::print("count 1. cmake .. -DCMAKE_BUILD_TYPE=Debugerror \n");
+                fmt::print("count error \n");
             }
         }  
         ref.push_back(0);
@@ -252,7 +252,7 @@ int main(int argc, char const* const* argv){
 
         if(std::filesystem::exists("../_fm_hg38_r") == 0){
         auto reduced_index = BiFMIndex<String<reduced_Sigma>>{reduced_chromosomes, /*samplingRate*/16, /*threadNbr*/ threads};
-        saveIndex(reduced_index, "../fm_hg38_r");
+        saveIndex(reduced_index, "../_fm_hg38_r");
 
         search_backtracking::search(reduced_index, reduced_queries, 0, [&](size_t queryId, auto cursor, size_t errors) {
         (void) errors; 
@@ -264,7 +264,7 @@ int main(int argc, char const* const* argv){
         }
         
         else{
-        auto reduced_index = loadIndex<BiFMIndex<String<reduced_Sigma>>>("../fm_hg38_r");
+        auto reduced_index = loadIndex<BiFMIndex<String<reduced_Sigma>>>("../_fm_hg38_r");
 
         search_backtracking::search(reduced_index, reduced_queries, 0, [&](size_t queryId, auto cursor, size_t errors) {
         (void) errors;
