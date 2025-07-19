@@ -203,12 +203,11 @@ int main(int argc, char const* const* argv){
         //     fmt::print("{} \n", ref);
         //  } // debugging
 
-        auto index = BiFMIndex<String<Sigma>>{chromosomes_with_complement, /*samplingRate*/16, /*threadNbr*/ threads};
-        saveIndex(index, "../_fm_hg38");
+        auto indexFile = cliRef->string() + ".index";
 
-        if(std::filesystem::exists("../_fm_hg38_r") == 0){
+        if(std::filesystem::exists(indexFile) == 0){
             auto index = BiFMIndex<String<Sigma>>{chromosomes_with_complement, /*samplingRate*/16, /*threadNbr*/ threads};
-            saveIndex(index, "../_fm_hg38");
+            saveIndex(index, indexFile);
 
             search_backtracking::search(index, queries, 0, [&](size_t queryId, auto cursor, size_t errors) {
             (void) errors;
@@ -219,7 +218,7 @@ int main(int argc, char const* const* argv){
         });
         }
         else{
-            auto index = loadIndex<BiFMIndex<String<Sigma>>>("../_fm_hg38");
+            auto index = loadIndex<BiFMIndex<String<Sigma>>>(indexFile);
 
             search_backtracking::search(index, queries, 0, [&](size_t queryId, auto cursor, size_t errors) {
             (void) errors;
@@ -248,11 +247,11 @@ int main(int argc, char const* const* argv){
             reduced_queries.push_back(reduction(query));
         }
 
-        //auto reduced_index;
+        auto indexFile = cliRef->string() + ".red.index";
 
-        if(std::filesystem::exists("../_fm_hg38_r") == 0){
+        if(std::filesystem::exists(indexFile) == 0){
         auto reduced_index = BiFMIndex<String<reduced_Sigma>>{reduced_chromosomes, /*samplingRate*/16, /*threadNbr*/ threads};
-        saveIndex(reduced_index, "../_fm_hg38_r");
+        saveIndex(reduced_index, indexFile);
 
         search_backtracking::search(reduced_index, reduced_queries, 0, [&](size_t queryId, auto cursor, size_t errors) {
         (void) errors; 
@@ -264,7 +263,7 @@ int main(int argc, char const* const* argv){
         }
         
         else{
-        auto reduced_index = loadIndex<BiFMIndex<String<reduced_Sigma>>>("../_fm_hg38_r");
+        auto reduced_index = loadIndex<BiFMIndex<String<reduced_Sigma>>>(indexFile);
 
         search_backtracking::search(reduced_index, reduced_queries, 0, [&](size_t queryId, auto cursor, size_t errors) {
         (void) errors;
