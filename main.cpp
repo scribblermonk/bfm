@@ -173,7 +173,7 @@ int main(int argc, char const* const* argv){
     }
     
     bool reduced = cliReduced; 
-    size_t threads = cliThreads;
+    size_t threads = *cliThreads;
 
     auto queries = std::vector<std::vector<uint8_t>>{}; // {3, 4, 3}, {2, 1, 2} unser Pattern/Read - Vektor {G, T, G} {C, A, C}
     //fasta input Queries
