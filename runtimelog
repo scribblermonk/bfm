@@ -1,0 +1,93 @@
+	Command being timed: "./bfm -r -t 16 -q /home/mi/nikov76/Dokumente/bfm/quer1.fasta -ref /home/mi/nikov76/Dokumente/bfm/ref.fna"
+	User time (seconds): 90.93
+	System time (seconds): 18.08
+	Percent of CPU this job got: 86%
+	Elapsed (wall clock) time (h:mm:ss or m:ss): 2:05.49
+	Average shared text size (kbytes): 0
+	Average unshared data size (kbytes): 0
+	Average stack size (kbytes): 0
+	Average total size (kbytes): 0
+	Maximum resident set size (kbytes): 13446600
+	Average resident set size (kbytes): 0
+	Major (requiring I/O) page faults: 9
+	Minor (reclaiming a frame) page faults: 3342205
+	Voluntary context switches: 23079
+	Involuntary context switches: 10403
+	Swaps: 0
+	File system inputs: 6041632
+	File system outputs: 0
+	Socket messages sent: 0
+	Socket messages received: 0
+	Signals delivered: 0
+	Page size (bytes): 4096
+	Exit status: 0
+Command terminated by signal 6
+	Command being timed: "./bfm -t 16 -q /home/mi/nikov76/Dokumente/bfm/quer1.fasta -ref /home/mi/nikov76/Dokumente/bfm/ref.fna"
+	User time (seconds): 20525.37
+	System time (seconds): 391.40
+	Percent of CPU this job got: 570%
+	Elapsed (wall clock) time (h:mm:ss or m:ss): 1:01:05
+	Average shared text size (kbytes): 0
+	Average unshared data size (kbytes): 0
+	Average stack size (kbytes): 0
+	Average total size (kbytes): 0
+	Maximum resident set size (kbytes): 86726260
+	Average resident set size (kbytes): 0
+	Major (requiring I/O) page faults: 159
+	Minor (reclaiming a frame) page faults: 168979776
+	Voluntary context switches: 3900599
+	Involuntary context switches: 1823387
+	Swaps: 0
+	File system inputs: 6664
+	File system outputs: 5097544
+	Socket messages sent: 0
+	Socket messages received: 0
+	Signals delivered: 0
+	Page size (bytes): 4096
+	Exit status: 0
+	Command being timed: "./bfm -t 16 -q /home/mi/nikov76/Dokumente/bfm/quer1.fasta -ref /srv/public/nikov76/ncbi_dataset/data/GCF_000001405.40/GCF_000001405.40_GRCh38.p14_genomic.fna"
+	User time (seconds): 18873.56
+	System time (seconds): 192.45
+	Percent of CPU this job got: 611%
+	Elapsed (wall clock) time (h:mm:ss or m:ss): 51:59.97
+	Average shared text size (kbytes): 0
+	Average unshared data size (kbytes): 0
+	Average stack size (kbytes): 0
+	Average total size (kbytes): 0
+	Maximum resident set size (kbytes): 86731180
+	Average resident set size (kbytes): 0
+	Major (requiring I/O) page faults: 137
+	Minor (reclaiming a frame) page faults: 28753870
+	Voluntary context switches: 2984647
+	Involuntary context switches: 1823672
+	Swaps: 0
+	File system inputs: 12472
+	File system outputs: 28252488
+	Socket messages sent: 0
+	Socket messages received: 0
+	Signals delivered: 0
+	Page size (bytes): 4096
+	Exit status: 0
+	Command being timed: "./bfm -t 16 -q /home/mi/nikov76/Dokumente/bfm/zero_quer.fasta -ref /srv/public/nikov76/ncbi_dataset/data/GCF_000001405.40/GCF_000001405.40_GRCh38.p14_genomic.fna"
+	User time (seconds): 88.42
+	System time (seconds): 14.62
+	Percent of CPU this job got: 99%
+	Elapsed (wall clock) time (h:mm:ss or m:ss): 1:43.26
+	Average shared text size (kbytes): 0
+	Average unshared data size (kbytes): 0
+	Average stack size (kbytes): 0
+	Average total size (kbytes): 0
+	Maximum resident set size (kbytes): 25530008
+	Average resident set size (kbytes): 0
+	Major (requiring I/O) page faults: 0
+	Minor (reclaiming a frame) page faults: 315392
+	Voluntary context switches: 9
+	Involuntary context switches: 10473
+	Swaps: 0
+	File system inputs: 0
+	File system outputs: 56
+	Socket messages sent: 0
+	Socket messages received: 0
+	Signals delivered: 0
+	Page size (bytes): 4096
+	Exit status: 0

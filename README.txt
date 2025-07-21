@@ -16,3 +16,6 @@ Commands for using masonsimulator:
 Cmake command for debugging:
     0. cmake .. -DCMAKE_BUILD_TYPE=Release
     1. cmake .. -DCMAKE_BUILD_TYPE=Debug
+
+Memory Issue Solution:
+    0. /srv/public/nikov76/ncbi_dataset/data/GCF_000001405.40/GCF_000001405.40_GRCh38.p14_genomic.fna 
