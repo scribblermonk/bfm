@@ -1,2 +1,2 @@
 #!/bin/bash
-echo "Benchmarkswerden Executed"
+echo "benchmarking commences"
