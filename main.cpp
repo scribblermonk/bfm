@@ -170,7 +170,7 @@ int main(int argc, char const* const* argv){
     if (auto failed = clice::parse(argc, argv); failed) {
         std::cerr << "parsing failed: " << *failed << "\n";
         return 1;
-    } auto reduced_index = loadIndex<BiFMIndex<String<reduced_Sigma>>>(indexFile);
+    }
 
     
     bool reduced = cliReduced; 

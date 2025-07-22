@@ -1,2 +1,2 @@
->Reference
+>Chromosome_0
 ACGTGCCCGCGTAATCT
