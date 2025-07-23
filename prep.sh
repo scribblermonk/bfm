@@ -9,7 +9,7 @@ cd ~/Documents/IVtools/build
 #   -r, --randomize STRING             - a list of letters, if they not appear, replace with one of them randomly (default: "")
 #   -t, --truncate UINT64              - truncate after given numbers of nucleotides (default: 18446744073709551615)
 echo "Preprocessing of the reference"
-./bin/iv fasta filter "/home/nikolai/Documents/human_genome/ncbi_dataset/data/GCF_000001405.40/GCF_000001405.40_GRCh38.p14_genomic.fna" -r "ACGT" -o "/home/nikolai/Documents/human_genome/enhanced_hg38" -t 1000 -u
+./bin/iv fasta filter "/srv/public/nikov76/ncbi_dataset/data/GCF_000001405.40/GCF_000001405.40_GRCh38.p14_genomic.fna" -r "ACGT" -o "/srv/public/nikov76/enhanced_hg38" -t 1000000 -u
 
 # read_simulator                         - simulates reads of a certain length 
 #   -i, --input PATH                     - path to a fasta file (default: "")
@@ -24,7 +24,7 @@ echo "Preprocessing of the reference"
 #   --seed UINT32                        - seed to initialize the random generator (default: 0)
 #   -d, --direction [rev_compl|fwd|both] - read direction, possible values: both: both direction, fwd: forward strand, rev_compl: reverse complement strand (default: both)
 echo "Generation of queries"
-./bin/iv read_simulator -i "/home/nikolai/Documents/human_genome/enhanced_hg38" -o "/home/nikolai/Documents/bfm/test_quer1.fasta"
-./bin/iv read_simulator -i "/home/nikolai/Documents/human_genome/enhanced_hg38" -o "/home/nikolai/Documents/bfm/test_quer1.fasta" -e 1 
-./bin/iv read_simulator -i "/home/nikolai/Documents/human_genome/enhanced_hg38" -o "/home/nikolai/Documents/bfm/test_quer1.fasta" -e 2
-./bin/iv read_simulator -i "/home/nikolai/Documents/human_genome/enhanced_hg38" -o "/home/nikolai/Documents/bfm/test_quer1.fasta" -e 3
+./bin/iv read_simulator -i "/srv/public/nikov76/enhanced_hg38" -o "/home/mi/nikov76/Dokumente/bfm/test_quer0.fasta"
+./bin/iv read_simulator -i "/srv/public/nikov76/enhanced_hg38" -o "/home/mi/nikov76/Dokumente/bfm/test_quer1.fasta" -e 1 
+./bin/iv read_simulator -i "/srv/public/nikov76/enhanced_hg38" -o "/home/mi/nikov76/Dokumente/bfm/test_quer2.fasta" -e 2
+./bin/iv read_simulator -i "/srv/public/nikov76/enhanced_hg38" -o "/home/mi/nikov76/Dokumente/bfm/test_quer3.fasta" -e 3
