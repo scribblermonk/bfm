@@ -25,3 +25,6 @@ echo "Preprocessing of the reference"
 #   -d, --direction [rev_compl|fwd|both] - read direction, possible values: both: both direction, fwd: forward strand, rev_compl: reverse complement strand (default: both)
 echo "Generation of queries"
 ./bin/iv read_simulator -i "/home/nikolai/Documents/human_genome/enhanced_hg38" -o "/home/nikolai/Documents/bfm/test_quer1.fasta"
+./bin/iv read_simulator -i "/home/nikolai/Documents/human_genome/enhanced_hg38" -o "/home/nikolai/Documents/bfm/test_quer1.fasta" -e 1 
+./bin/iv read_simulator -i "/home/nikolai/Documents/human_genome/enhanced_hg38" -o "/home/nikolai/Documents/bfm/test_quer1.fasta" -e 2
+./bin/iv read_simulator -i "/home/nikolai/Documents/human_genome/enhanced_hg38" -o "/home/nikolai/Documents/bfm/test_quer1.fasta" -e 3
