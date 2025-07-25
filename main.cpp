@@ -37,6 +37,12 @@ auto cliRef = clice::Argument{ .args = {"-ref", "--reference"},
                                .tags = {"required"} // "required"
                             };
 
+auto cliError = clice::Argument{ .args = {"-e", "--allowed_errors"},
+                                 .desc = "hamming/levinthal distance",
+                                 .value = size_t{},
+                                 .tags = {"required"}, //"required"
+                            };
+
 auto cliHelp = clice::Argument{ .args   = "--help", .desc   = "prints the help page", .cb     = [](){ std::cout << clice::generateHelp(); exit(0); }, .tags   = {"ignore-required"}, };
 // generates help page
 
@@ -175,6 +181,7 @@ int main(int argc, char const* const* argv){
     
     bool reduced = cliReduced; 
     size_t threads = *cliThreads;
+    size_t err = *cliError
 
     auto queries = std::vector<std::vector<uint8_t>>{}; // {3, 4, 3}, {2, 1, 2} unser Pattern/Read - Vektor {G, T, G} {C, A, C}
     //fasta input Queries
@@ -210,7 +217,7 @@ int main(int argc, char const* const* argv){
             auto index = BiFMIndex<String<Sigma>>{chromosomes_with_complement, /*samplingRate*/16, /*threadNbr*/ threads};
             saveIndex(index, indexFile);
 
-            search_backtracking::search(index, queries, 0, [&](size_t queryId, auto cursor, size_t errors) {
+            search_backtracking::search(index, queries, err, [&](size_t queryId, auto cursor, size_t errors) {
             (void) errors;
             for (auto i : cursor) {  
                 auto [chr, pos] = index.locate(i); // cursor stuff
@@ -221,7 +228,7 @@ int main(int argc, char const* const* argv){
         else{
             auto index = loadIndex<BiFMIndex<String<Sigma>>>(indexFile);
 
-            search_backtracking::search(index, queries, 0, [&](size_t queryId, auto cursor, size_t errors) {
+            search_backtracking::search(index, queries, err, [&](size_t queryId, auto cursor, size_t errors) {
             (void) errors;
             for (auto i : cursor) {  
                 auto [chr, pos] = index.locate(i); // cursor stuff
@@ -254,7 +261,7 @@ int main(int argc, char const* const* argv){
         auto reduced_index = BiFMIndex<String<reduced_Sigma>>{reduced_chromosomes, /*samplingRate*/16, /*threadNbr*/ threads};
         saveIndex(reduced_index, indexFile);
 
-        search_backtracking::search(reduced_index, reduced_queries, 0, [&](size_t queryId, auto cursor, size_t errors) {
+        search_backtracking::search(reduced_index, reduced_queries, 0, [&](size_t queryId, auto cursor, size_t errors) { 
         (void) errors; 
         for (auto i : cursor) {  
             auto [chr, pos] = reduced_index.locate(i); // cursor stuff

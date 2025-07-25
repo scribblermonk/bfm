@@ -1,6 +1,6 @@
-#!/bin/bash
+#!/usr/bin/env bash 
 #change directory to /build for the correct execution 
-cd ~/Documents/IVtools/build
+cd ~/Dokumente/iVtools/build
 
 # fasta
 #   filter [PATH]...                     - filters or transforms fasta files 
@@ -9,7 +9,7 @@ cd ~/Documents/IVtools/build
 #   -r, --randomize STRING             - a list of letters, if they not appear, replace with one of them randomly (default: "")
 #   -t, --truncate UINT64              - truncate after given numbers of nucleotides (default: 18446744073709551615)
 echo "Preprocessing of the reference"
-./bin/iv fasta filter "/srv/public/nikov76/ncbi_dataset/data/GCF_000001405.40/GCF_000001405.40_GRCh38.p14_genomic.fna" -r "ACGT" -o "/srv/public/nikov76/enhanced_hg38" -t 1000000 -u
+./bin/iv fasta filter "/srv/public/nikov76/ncbi_dataset/data/GCF_000001405.40/GCF_000001405.40_GRCh38.p14_genomic.fna" -r "ACGT" -o "/srv/public/nikov76/enhanced_hg38" -u
 
 # read_simulator                         - simulates reads of a certain length 
 #   -i, --input PATH                     - path to a fasta file (default: "")
