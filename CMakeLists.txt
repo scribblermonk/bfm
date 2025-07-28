@@ -10,7 +10,7 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 
 find_package(OpenMP QUIET)
 include(cmake/CPM.cmake)
-CPMAddPackage("gh:SGSSGene/fmindex-collection#comp/awfmindex")
+CPMAddPackage("gh:SGSSGene/fmindex-collection@1.1.1")
 CPMAddPackage("gh:fmtlib/fmt@11.2.0#11.2.0")
 CPMAddPackage("gh:SGSSGene/clice@1.1.1")
 CPMAddPackage("gh:iv-project/IVio@0.4.3")

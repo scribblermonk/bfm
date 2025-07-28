@@ -11,7 +11,7 @@ cd ~/Dokumente/bfm
 # -t, --threads UINT64        - enter thread count (required)
 # -q, --queries PATH          - input query for fasta file location (required)
 # -ref, --reference PATH      - input reference fasta file location (required)
-# -e, --allowed_errors UINT64 - hamming/levinthal distance (required)
+# -e, --allowed_errors UINT64 - hamming/Levenshtein distance (required)
 echo "Benchmarking commences"
 
 echo "Registering number of reads"

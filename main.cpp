@@ -13,7 +13,7 @@
 #include <clice/clice.h>
 #include <ivio/ivio.h>
 
-using namespace fmindex_collection; //for all of the fmindex methods
+using namespace fmc; //for all of the fmindex methods
     
 auto cliReduced = clice::Argument{ .args   = {"-r", "--reduced"},                      
                                 .desc   = "enter reduced mode",
@@ -48,25 +48,6 @@ auto cliHelp = clice::Argument{ .args   = "--help", .desc   = "prints the help p
 
 constexpr size_t Sigma = 5; // Sigma == Alphabet size
 constexpr size_t reduced_Sigma = 3; // reduced Sigma == reduced alphabetsize
-
-template <size_t T_Sigma>
-using String = string::InterleavedBitvector16<T_Sigma>; // template/"function call"
-
-template <typename Index> // saves index
-void saveIndex(Index const& _index, std::filesystem::path _fileName) { 
-    auto ofs     = std::ofstream(_fileName, std::ios::binary);
-    auto archive = cereal::BinaryOutputArchive{ofs};
-    archive(_index);
-}
-
-template <typename Index> // loads index
-auto loadIndex(std::filesystem::path _fileName) {
-    auto ifs     = std::ifstream(_fileName, std::ios::binary);
-    auto archive = cereal::BinaryInputArchive{ifs};
-    auto index = Index{};
-    archive(index);
-    return index;
-}
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 std::vector<uint8_t> letter_to_number(std::string_view seq){ // string_view for minimal copy 
@@ -214,10 +195,10 @@ int main(int argc, char const* const* argv){
         auto indexFile = cliRef->string() + ".index";
 
         if(std::filesystem::exists(indexFile) == 0){
-            auto index = BiFMIndex<String<Sigma>>{chromosomes_with_complement, /*samplingRate*/16, /*threadNbr*/ threads};
+            auto index = BiFMIndex<Sigma>{chromosomes_with_complement, /*samplingRate*/16, /*threadNbr*/ threads};
             saveIndex(index, indexFile);
 
-            search_backtracking::search(index, queries, err, [&](size_t queryId, auto cursor, size_t errors) {
+            search< /*Levenshtein Distance*/true>(index, queries, err, [&](size_t queryId, auto cursor, size_t errors) {
             (void) errors;
             for (auto i : cursor) {  
                 auto [chr, pos] = index.locate(i); // cursor stuff
@@ -226,9 +207,9 @@ int main(int argc, char const* const* argv){
         });
         }
         else{
-            auto index = loadIndex<BiFMIndex<String<Sigma>>>(indexFile);
+            auto index = loadIndex<BiFMIndex<Sigma>>(indexFile);
 
-            search_backtracking::search(index, queries, err, [&](size_t queryId, auto cursor, size_t errors) {
+            search< /*Levenshtein Distance*/true>(index, queries, err, [&](size_t queryId, auto cursor, size_t errors) {
             (void) errors;
             for (auto i : cursor) {  
                 auto [chr, pos] = index.locate(i); // cursor stuff
@@ -258,10 +239,10 @@ int main(int argc, char const* const* argv){
         auto indexFile = cliRef->string() + ".red.index";
 
         if(std::filesystem::exists(indexFile) == 0){
-        auto reduced_index = BiFMIndex<String<reduced_Sigma>>{reduced_chromosomes, /*samplingRate*/16, /*threadNbr*/ threads};
+        auto reduced_index = BiFMIndex<reduced_Sigma>{reduced_chromosomes, /*samplingRate*/16, /*threadNbr*/ threads};
         saveIndex(reduced_index, indexFile);
 
-        search_backtracking::search(reduced_index, reduced_queries, 0, [&](size_t queryId, auto cursor, size_t errors) { 
+        search</*Levenshtein Distance*/true>(reduced_index, reduced_queries, 0, [&](size_t queryId, auto cursor, size_t errors) { 
         (void) errors; 
         for (auto i : cursor) {  
             auto [chr, pos] = reduced_index.locate(i); // cursor stuff
@@ -271,9 +252,9 @@ int main(int argc, char const* const* argv){
         }
         
         else{
-        auto reduced_index = loadIndex<BiFMIndex<String<reduced_Sigma>>>(indexFile);
+        auto reduced_index = loadIndex<BiFMIndex<reduced_Sigma>>(indexFile);
 
-        search_backtracking::search(reduced_index, reduced_queries, 0, [&](size_t queryId, auto cursor, size_t errors) {
+        search</*Levenshtein Distance*/true>(reduced_index, reduced_queries, 0, [&](size_t queryId, auto cursor, size_t errors) {
         (void) errors;
         for (auto i : cursor) {  
             auto [chr, pos] = reduced_index.locate(i); // cursor stuff
