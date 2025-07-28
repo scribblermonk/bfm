@@ -12,5 +12,19 @@ cd ~/Dokumente/bfm
 # -q, --queries PATH          - input query for fasta file location (required)
 # -ref, --reference PATH      - input reference fasta file location (required)
 # -e, --allowed_errors UINT64 - hamming/levinthal distance (required)
-echo "benchmarking commences"
-/usr/bin/time -a -o ../runtimelog -v ./bfm  -t 16 -q /home/mi/nikov76/Dokumente/bfm/0quer.fasta -ref /srv/public/nikov76/ncbi_dataset/data/GCF_000001405.40/GCF_000001405.40_GRCh38.p14_genomic.fna
+echo "Benchmarking commences"
+
+echo "Registering number of reads"
+export N=${1:-1000}
+
+echo "Not reduced"
+for i in {0,..,3}; do
+echo "Hamming/Levinthal distance ${i}"
+/usr/bin/time -a -o ../runtimelog_${i}_n${N} -v ./bfm  -t 16 -e ${i} -q /home/mi/nikov76/Dokumente/bfm/test_quer${i}_${N}.fasta -ref /srv/public/nikov76/ncbi_dataset/data/GCF_000001405.40/GCF_000001405.40_GRCh38.p14_genomic.fna
+done 
+
+echo "Reduced"
+for i in {0,..,3}; do
+echo "Hamming/Levinthal distance ${i}"
+/usr/bin/time -a -o ../runtimelog_r_${i}_n${N} -v ./bfm -r -t 16 -e ${i} -q /home/mi/nikov76/Dokumente/bfm/test_quer${i}_${N}.fasta -ref /srv/public/nikov76/ncbi_dataset/data/GCF_000001405.40/GCF_000001405.40_GRCh38.p14_genomic.fna
+done 

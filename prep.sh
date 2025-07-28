@@ -8,8 +8,8 @@ cd ~/Dokumente/iVtools/build
 #   -u, --upper-case                   - translates words to upper case 
 #   -r, --randomize STRING             - a list of letters, if they not appear, replace with one of them randomly (default: "")
 #   -t, --truncate UINT64              - truncate after given numbers of nucleotides (default: 18446744073709551615)
-echo "Preprocessing of the reference"
-./bin/iv fasta filter "/srv/public/nikov76/ncbi_dataset/data/GCF_000001405.40/GCF_000001405.40_GRCh38.p14_genomic.fna" -r "ACGT" -o "/srv/public/nikov76/enhanced_hg38" -u
+#echo "Preprocessing of the reference"
+#./bin/iv fasta filter "/srv/public/nikov76/ncbi_dataset/data/GCF_000001405.40/GCF_000001405.40_GRCh38.p14_genomic.fna" -r "ACGT" -o "/srv/public/nikov76/enhanced_hg38" -u
 
 # read_simulator                         - simulates reads of a certain length 
 #   -i, --input PATH                     - path to a fasta file (default: "")
@@ -24,7 +24,11 @@ echo "Preprocessing of the reference"
 #   --seed UINT32                        - seed to initialize the random generator (default: 0)
 #   -d, --direction [rev_compl|fwd|both] - read direction, possible values: both: both direction, fwd: forward strand, rev_compl: reverse complement strand (default: both)
 echo "Generation of queries"
-./bin/iv read_simulator -i "/srv/public/nikov76/enhanced_hg38" -o "/home/mi/nikov76/Dokumente/bfm/test_quer0.fasta"
-./bin/iv read_simulator -i "/srv/public/nikov76/enhanced_hg38" -o "/home/mi/nikov76/Dokumente/bfm/test_quer1.fasta" -e 1 
-./bin/iv read_simulator -i "/srv/public/nikov76/enhanced_hg38" -o "/home/mi/nikov76/Dokumente/bfm/test_quer2.fasta" -e 2
-./bin/iv read_simulator -i "/srv/public/nikov76/enhanced_hg38" -o "/home/mi/nikov76/Dokumente/bfm/test_quer3.fasta" -e 3
+
+echo "Registering number of reads"
+export N=${1:-1000}
+
+./bin/iv read_simulator -n ${N} -i "/srv/public/nikov76/enhanced_hg38" -o "/home/mi/nikov76/Dokumente/bfm/test_quer0_${N}.fasta"
+./bin/iv read_simulator -n ${N} -i "/srv/public/nikov76/enhanced_hg38" -o "/home/mi/nikov76/Dokumente/bfm/test_quer1_${N}.fasta" -e 1 
+./bin/iv read_simulator -n ${N} -i "/srv/public/nikov76/enhanced_hg38" -o "/home/mi/nikov76/Dokumente/bfm/test_quer2_${N}.fasta" -e 2
+./bin/iv read_simulator -n ${N} -i "/srv/public/nikov76/enhanced_hg38" -o "/home/mi/nikov76/Dokumente/bfm/test_quer3_${N}.fasta" -e 3
