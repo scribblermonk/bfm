@@ -12,6 +12,8 @@
 #include <ranges>
 #include <clice/clice.h>
 #include <ivio/ivio.h>
+#include "ReducedIndex.h"
+#include "ReducedIndexCursor.h"
 
 using namespace fmc; //for all of the fmindex methods
     
@@ -222,7 +224,7 @@ int main(int argc, char const* const* argv){
 
     // mit reduction
     if(reduced){
-        std::cout << "running reduced BiFMindReferences\n";
+        std::cout << "running BiFMindex 2.0 (ReducedIndex)\n";
         auto reduced_chromosomes = chromosomes;
 
         for (size_t i = 0; i < size(reduced_chromosomes); i++){ 
@@ -239,7 +241,7 @@ int main(int argc, char const* const* argv){
         auto indexFile = cliRef->string() + ".red.index";
 
         if(std::filesystem::exists(indexFile) == 0){
-        auto reduced_index = BiFMIndex<reduced_Sigma>{reduced_chromosomes, /*samplingRate*/16, /*threadNbr*/ threads};
+        auto reduced_index = ReducedIndex<reduced_Sigma>{reduced_chromosomes, /*samplingRate*/16, /*threadNbr*/ threads};
         saveIndex(reduced_index, indexFile);
 
         search</*Levenshtein Distance*/true>(reduced_index, reduced_queries, 0, [&](size_t queryId, auto cursor, size_t errors) { 
@@ -252,7 +254,7 @@ int main(int argc, char const* const* argv){
         }
         
         else{
-        auto reduced_index = loadIndex<BiFMIndex<reduced_Sigma>>(indexFile);
+        auto reduced_index = loadIndex<ReducedIndex<reduced_Sigma>>(indexFile);
 
         search</*Levenshtein Distance*/true>(reduced_index, reduced_queries, 0, [&](size_t queryId, auto cursor, size_t errors) {
         (void) errors;
