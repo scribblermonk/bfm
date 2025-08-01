@@ -33,7 +33,7 @@ export N=${1:-1000}
 export enhanced="/srv/public/nikov76/short_enhanced_hg38"
 
 # creating test enviroment
-mkdir /home/mi/nikov76/Dokumente/bfm/lab/test_${N}
+mkdir -p /home/mi/nikov76/Dokumente/bfm/lab/test_${N}
 
 ./bin/iv read_simulator -n ${N} -d fwd -i $enhanced -o "/home/mi/nikov76/Dokumente/bfm/lab/test_${N}/test_quer0_${N}.fasta"
 ./bin/iv read_simulator -n ${N} -d fwd -i $enhanced -o "/home/mi/nikov76/Dokumente/bfm/lab/test_${N}/test_quer1_${N}.fasta" -e 1 
