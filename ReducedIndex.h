@@ -19,27 +19,31 @@ template <size_t TSigma, template <size_t> typename String = string::FlattenedBi
 struct ReducedIndex {
     using ADEntry = SparseArray::value_t;
 
-    static size_t constexpr Sigma     = TSigma;
+    static size_t constexpr Sigma = TSigma;
     static size_t constexpr FirstSymb = 1;
 
     String<Sigma> bwt;
-    String<Sigma> bwtRev;
+    String<Sigma>& bwtRev{bwt}; // Referenz zu BWT 
     std::array<size_t, Sigma+1> C{};
     SparseArray annotatedArray;
 
     ReducedIndex() = default;
-    ReducedIndex(ReducedIndex&&) noexcept = default;
+    ReducedIndex(ReducedIndex&& o) noexcept 
+        :bwt{std::move(o.bwt)}
+        ,C{std::move(o.C)}
+        ,annotatedArray{std::move(o.annotatedArray)}
+     {}
 
-    ReducedIndex(std::span<uint8_t const> _bwt, std::span<uint8_t const> _bwtRev, SparseArray _annotatedArray)
+    ReducedIndex(std::span<uint8_t const> _bwt, /* std::span<uint8_t const> _bwtRev, */ SparseArray _annotatedArray)
         : bwt{_bwt}
-        , bwtRev{_bwtRev}
+        //, bwtRev{_bwtRev}
         , C{computeC(bwt)}
         , annotatedArray{std::move(_annotatedArray)}
     {
-        assert(bwt.size() == bwtRev.size());
-        if (bwt.size() != bwtRev.size()) {
-            throw std::runtime_error("bwt don't have the same size: " + std::to_string(bwt.size()) + " " + std::to_string(bwtRev.size()));
-        }
+        // assert(bwt.size() == bwtRev.size());
+        // if (bwt.size() != bwtRev.size()) {
+        //     throw std::runtime_error("bwt don't have the same size: " + std::to_string(bwt.size()) + " " // + std::to_string(bwtRev.size()));
+        // }
     }
 
     ReducedIndex(Sequence auto const& _sequence, SparseArray const& _annotatedSequence, size_t _threadNbr, bool omegaSorting = false) {
@@ -50,24 +54,24 @@ struct ReducedIndex {
         // copy text into custom buffer
         auto inputText = createInputText(_sequence, omegaSorting);
 
-        // create bwt, bwtRev and annotatedArray
+        // create bwt and notatedArray
         auto [_bwt, _annotatedArray] = createBWTAndAnnotatedArray(inputText, _annotatedSequence, _threadNbr, omegaSorting);
-        #if defined(__GNUC__) && !defined(__clang__)
-        #pragma GCC diagnostic push
-        #pragma GCC diagnostic ignored "-Wstringop-overflow"
-        std::ranges::reverse(inputText);
-        #pragma GCC diagnostic pop
+        // #if defined(__GNUC__) && !defined(__clang__)
+        // #pragma GCC diagnostic push
+        // #pragma GCC diagnostic ignored "-Wstringop-overflow"
+        // std::ranges::reverse(inputText);
+        // #pragma GCC diagnostic pop
 
-        #else
-        std::ranges::reverse(inputText);
+        // #else
+        // std::ranges::reverse(inputText);
 
-        #endif
-        auto _bwtRev = createBWT(inputText, _threadNbr, omegaSorting);
+        // #endif
+        //auto _bwtRev = createBWT(inputText, _threadNbr, omegaSorting);
         decltype(inputText){}.swap(inputText); // inputText memory can be deleted
 
         // initialize this ReducedIndex properly
         bwt = {_bwt};
-        bwtRev = {_bwtRev};
+        //bwtRev = {_bwtRev};
         C = computeC(bwt);
         annotatedArray = std::move(_annotatedArray);
     }
@@ -121,7 +125,12 @@ struct ReducedIndex {
     }
 
     auto operator=(ReducedIndex const&) -> ReducedIndex& = delete;
-    auto operator=(ReducedIndex&&) noexcept -> ReducedIndex& = default;
+    auto operator=(ReducedIndex&& o) noexcept -> ReducedIndex& {
+        bwt = std::move(o.bwt);
+        C = std::move(o.C);
+        annotatedArray = std::move(o.annotatedArray);
+        return *this;
+    }
 
     size_t size() const {
         return bwt.size();
@@ -162,7 +171,7 @@ struct ReducedIndex {
 
     template <typename Archive>
     void serialize(Archive& ar) {
-        ar(bwt, bwtRev, C, annotatedArray);
+        ar(bwt, /*bwtRev,*/ C, annotatedArray);
     }
 };
 }

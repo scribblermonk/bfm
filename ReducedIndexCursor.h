@@ -58,7 +58,7 @@ struct ReducedIndexCursor {
     }
 
     auto extendRight() const -> std::array<ReducedIndexCursor, Sigma> {
-        auto const& bwt = index->bwtRev;
+        auto const& bwt = index->bwt;
         auto [rs1, prs1] = bwt.all_ranks_and_prefix_ranks(lbRev);
         auto [rs2, prs2] = bwt.all_ranks_and_prefix_ranks(lbRev+len);
 
@@ -87,7 +87,7 @@ struct ReducedIndexCursor {
         return newCursor;
     }
     auto extendRight(size_t symb) const -> ReducedIndexCursor {
-        auto& bwt = index->bwtRev;
+        auto& bwt = index->bwt;
         size_t newLb    = lb + bwt.prefix_rank(lbRev+len, symb) - bwt.prefix_rank(lbRev, symb);
         size_t newLbRev = bwt.rank(lbRev, symb);
         size_t newLen   = bwt.rank(lbRev+len, symb) - newLbRev;

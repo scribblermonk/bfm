@@ -28,7 +28,14 @@ echo "Generation of queries"
 echo "Registering number of reads"
 export N=${1:-1000}
 
-./bin/iv read_simulator -n ${N} -i "/srv/public/nikov76/enhanced_hg38" -o "/home/mi/nikov76/Dokumente/bfm/test_quer0_${N}.fasta"
-./bin/iv read_simulator -n ${N} -i "/srv/public/nikov76/enhanced_hg38" -o "/home/mi/nikov76/Dokumente/bfm/test_quer1_${N}.fasta" -e 1 
-./bin/iv read_simulator -n ${N} -i "/srv/public/nikov76/enhanced_hg38" -o "/home/mi/nikov76/Dokumente/bfm/test_quer2_${N}.fasta" -e 2
-./bin/iv read_simulator -n ${N} -i "/srv/public/nikov76/enhanced_hg38" -o "/home/mi/nikov76/Dokumente/bfm/test_quer3_${N}.fasta" -e 3
+#toggle for shortened reduced genome
+#export enhanced="/srv/public/nikov76/enhanced_hg38"
+export enhanced="/srv/public/nikov76/short_enhanced_hg38"
+
+# creating test enviroment
+mkdir /home/mi/nikov76/Dokumente/bfm/lab/test_${N}
+
+./bin/iv read_simulator -n ${N} -d fwd -i $enhanced -o "/home/mi/nikov76/Dokumente/bfm/lab/test_${N}/test_quer0_${N}.fasta"
+./bin/iv read_simulator -n ${N} -d fwd -i $enhanced -o "/home/mi/nikov76/Dokumente/bfm/lab/test_${N}/test_quer1_${N}.fasta" -e 1 
+./bin/iv read_simulator -n ${N} -d fwd -i $enhanced -o "/home/mi/nikov76/Dokumente/bfm/lab/test_${N}/test_quer2_${N}.fasta" -e 2
+./bin/iv read_simulator -n ${N} -d fwd -i $enhanced -o "/home/mi/nikov76/Dokumente/bfm/lab/test_${N}/test_quer3_${N}.fasta" -e 3

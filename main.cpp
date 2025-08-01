@@ -117,7 +117,7 @@ std::vector<std::vector<uint8_t>> reverse_complement_generator(std::vector<std::
         std::vector<uint8_t> reverse_complement = {}; 
         reverse_complement.reserve(size(ref)); 
 
-        for (const uint8_t& i: ref | std::views::reverse) // fancy method to generate revers
+        for (const uint8_t& i: ref | std::views::reverse) // fancy method to generate reverse
         { 
             switch(i) {
                 case 1:
@@ -160,7 +160,6 @@ int main(int argc, char const* const* argv){
         std::cerr << "parsing failed: " << *failed << "\n";
         return 1;
     }
-
     
     bool reduced = cliReduced; 
     size_t threads = *cliThreads;
@@ -175,12 +174,15 @@ int main(int argc, char const* const* argv){
     }
 
     auto chromosomes = std::vector<std::vector<uint8_t>>{}; // {4, 4, 4, 4, 1, 2, 2, 2, 1, 2, 3, 4, 4, 4, 4} unser  Text/Referenz - Vektor mit {T, T, T, T, A, C, C, C, A, C, G, T, T, T, T} 
+    std::vector<uint8_t> genome{};
     //fasta input Reference
     auto inputRef = *cliRef;
     auto ref_reader = ivio::fasta::reader{{.input = inputRef}};
     for (auto record_view : ref_reader) {
-        chromosomes.push_back(letter_to_number(record_view.seq));
+        std::vector<uint8_t> chromosome = letter_to_number(record_view.seq);
+        genome.insert(genome.end(), chromosome.begin(), chromosome.end()); //concat instead
     }
+    chromosomes.push_back(genome);
     
     // ohne reduction
     if(!reduced){
@@ -190,36 +192,43 @@ int main(int argc, char const* const* argv){
 
         chromosomes_with_complement = reverse_complement_generator(chromosomes_with_complement);
         
-        // for(auto ref : chromosomes_with_complement){
+        // for(auto ref : queries){
         //     fmt::print("{} \n", ref);
         //  } // debugging
 
+        // for(auto ref : chromosomes_with_complement){
+        //     fmt::print("{} \n", ref);
+        //  } // debugging
         auto indexFile = cliRef->string() + ".index";
 
         if(std::filesystem::exists(indexFile) == 0){
             auto index = BiFMIndex<Sigma>{chromosomes_with_complement, /*samplingRate*/16, /*threadNbr*/ threads};
             saveIndex(index, indexFile);
 
-            search< /*Levenshtein Distance*/true>(index, queries, err, [&](size_t queryId, auto cursor, size_t errors) {
-            (void) errors;
-            for (auto i : cursor) {  
-                auto [chr, pos] = index.locate(i); // cursor stuff
-                 hit_log << fmt::format("query_index/chromosome_index/position_of_hit: {}/{}/{}\n", queryId, chr, pos);  // cursor.count() == range, range term is confusing, print fmt combines printf and stdcout
-            }
-        });
+            //search< /*Levenshtein Distance*/true>(index, queries, err, [&](size_t queryId, auto cursor, size_t errors) {
+            auto ss = getCachedSearchScheme</*Levenshtein Distance*/true>(queries[0].size(), 0, err);
+            search_ng21::search(index, queries, ss, [&](size_t queryId, auto cursor, size_t errors) {
+                (void) errors;
+                for (auto i : cursor) {  
+                    auto [sa, offset] = index.locate(i); // cursor stuff
+                    auto [chr, pos] = sa;
+                    hit_log << fmt::format("query_index/chromosome_index/position_of_hit: {}/{}/{} with {} errors\n", queryId, chr, pos+offset, errors);  // cursor.count() == range, range term is confusing, print fmt combines printf and stdcout
+                }
+            });
         }
         else{
             auto index = loadIndex<BiFMIndex<Sigma>>(indexFile);
-
-            search< /*Levenshtein Distance*/true>(index, queries, err, [&](size_t queryId, auto cursor, size_t errors) {
-            (void) errors;
-            for (auto i : cursor) {  
-                auto [chr, pos] = index.locate(i); // cursor stuff
-                hit_log << fmt::format("query_index/chromosome_index/position_of_hit: {}/{}/{}\n", queryId, chr, pos);  // cursor.count() == range, range term is confusing, print fmt combines printf and stdcout
-            }
-        });
+            //search< /*Levenshtein Distance*/true>(index, queries, err, [&](size_t queryId, auto cursor, size_t errors) {
+            auto ss = getCachedSearchScheme</*Levenshtein Distance*/true>(queries[0].size(), 0, err);
+            search_ng21::search(index, queries, ss, [&](size_t queryId, auto cursor, size_t errors) {
+                (void) errors;
+                for (auto i : cursor) {  
+                    auto [sa, offset] = index.locate(i); // cursor stuff
+                    auto [chr, pos] = sa;
+                    hit_log << fmt::format("query_index/chromosome_index/position_of_hit: {}/{}/{} with {} errors\n", queryId, chr, pos+offset, errors);  // cursor.count() == range, range term is confusing, print fmt combines printf and stdcout
+                }
+            });
         }
-
     }
 
     // mit reduction
@@ -244,11 +253,14 @@ int main(int argc, char const* const* argv){
         auto reduced_index = ReducedIndex<reduced_Sigma>{reduced_chromosomes, /*samplingRate*/16, /*threadNbr*/ threads};
         saveIndex(reduced_index, indexFile);
 
-        search</*Levenshtein Distance*/true>(reduced_index, reduced_queries, 0, [&](size_t queryId, auto cursor, size_t errors) { 
+        //search</*Levenshtein Distance*/true>(reduced_index, reduced_queries, err, [&](size_t queryId, auto cursor, size_t errors) { 
+        auto ss = getCachedSearchScheme</*Levenshtein Distance*/true>(queries[0].size(), 0, err);
+        search_ng21::search(reduced_index, reduced_queries, ss, [&](size_t queryId, auto cursor, size_t errors) {
         (void) errors; 
         for (auto i : cursor) {  
-            auto [chr, pos] = reduced_index.locate(i); // cursor stuff
-            hit_log << fmt::format("query_index/chromosome_index/position_of_hit: {}/{}/{}\n", queryId, chr, pos);  // cursor.count() == range, range term is confusing, print fmt combines printf and stdcout
+            auto [sa, offset] = reduced_index.locate(i); // cursor stuff
+            auto [chr, pos] = sa;
+            hit_log << fmt::format("query_index/chromosome_index/position_of_hit: {}/{}/{} with {} errors\n", queryId, chr, pos+offset, errors);  // cursor.count() == range, range term is confusing, print fmt combines printf and stdcout
         }
         });
         }
@@ -256,16 +268,18 @@ int main(int argc, char const* const* argv){
         else{
         auto reduced_index = loadIndex<ReducedIndex<reduced_Sigma>>(indexFile);
 
-        search</*Levenshtein Distance*/true>(reduced_index, reduced_queries, 0, [&](size_t queryId, auto cursor, size_t errors) {
+        //search</*Levenshtein Distance*/true>(reduced_index, reduced_queries, err, [&](size_t queryId, auto cursor, size_t errors) {
+        auto ss = getCachedSearchScheme</*Levenshtein Distance*/true>(queries[0].size(), 0, err);
+        search_ng21::search(reduced_index, reduced_queries, ss, [&](size_t queryId, auto cursor, size_t errors) {
         (void) errors;
         for (auto i : cursor) {  
-            auto [chr, pos] = reduced_index.locate(i); // cursor stuff
-            hit_log << fmt::format("query_index/chromosome_index/position_of_hit: {}/{}/{}\n", queryId, chr, pos);  // cursor.count() == range, range term is confusing, print fmt combines printf and stdcout
+            auto [sa, offset] = reduced_index.locate(i); // cursor stuff
+            auto [chr, pos] = sa;
+            hit_log << fmt::format("query_index/chromosome_index/position_of_hit: {}/{}/{} with {} errors\n", queryId, chr, pos+offset, errors);  // cursor.count() == range, range term is confusing, print fmt combines printf and stdcout
         }
         });
         }
     }
-
     return 0; 
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
