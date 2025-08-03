@@ -33,9 +33,9 @@ export N=${1:-1000}
 export enhanced="/srv/public/nikov76/short_enhanced_hg38"
 
 # creating test enviroment
-mkdir -p /home/mi/nikov76/Dokumente/bfm/lab/test_${N}
+mkdir -p /srv/public/nikov76/lab/test_${N}
 
-./bin/iv read_simulator -n ${N} -d fwd -i $enhanced -o "/home/mi/nikov76/Dokumente/bfm/lab/test_${N}/test_quer0_${N}.fasta"
-./bin/iv read_simulator -n ${N} -d fwd -i $enhanced -o "/home/mi/nikov76/Dokumente/bfm/lab/test_${N}/test_quer1_${N}.fasta" -e 1 
-./bin/iv read_simulator -n ${N} -d fwd -i $enhanced -o "/home/mi/nikov76/Dokumente/bfm/lab/test_${N}/test_quer2_${N}.fasta" -e 2
-./bin/iv read_simulator -n ${N} -d fwd -i $enhanced -o "/home/mi/nikov76/Dokumente/bfm/lab/test_${N}/test_quer3_${N}.fasta" -e 3
+./bin/iv read_simulator -n ${N} -d fwd -i $enhanced -o "/srv/public/nikov76/lab/test_${N}/test_quer0_${N}.fasta"
+./bin/iv read_simulator -n ${N} -d fwd -i $enhanced -o "/srv/public/nikov76/lab/test_${N}/test_quer1_${N}.fasta" -e 1 
+./bin/iv read_simulator -n ${N} -d fwd -i $enhanced -o "/srv/public/nikov76/lab/test_${N}/test_quer2_${N}.fasta" -e 2
+./bin/iv read_simulator -n ${N} -d fwd -i $enhanced -o "/srv/public/nikov76/lab/test_${N}/test_quer3_${N}.fasta" -e 3
