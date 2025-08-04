@@ -212,7 +212,7 @@ int main(int argc, char const* const* argv){
                 for (auto i : cursor) {  
                     auto [sa, offset] = index.locate(i); // cursor stuff
                     auto [chr, pos] = sa;
-                    hit_log << fmt::format("query_index/position_of_hit: {}/{} with {} errors\n", queryId, chr, pos+offset, errors);  // cursor.count() == range, range term is confusing, print fmt combines printf and stdcout
+                    hit_log << fmt::format("query_index/position_of_hit: {}/{} with {} errors\n", queryId, pos+offset, errors);  // cursor.count() == range, range term is confusing, print fmt combines printf and stdcout
                 }
             });
         }
@@ -225,7 +225,7 @@ int main(int argc, char const* const* argv){
                 for (auto i : cursor) {  
                     auto [sa, offset] = index.locate(i); // cursor stuff
                     auto [chr, pos] = sa;
-                    hit_log << fmt::format("query_index/position_of_hit: {}/{} with {} errors\n", queryId, chr, pos+offset, errors);  // cursor.count() == range, range term is confusing, print fmt combines printf and stdcout
+                    hit_log << fmt::format("query_index/position_of_hit: {}/{} with {} errors\n", queryId, pos+offset, errors);  // cursor.count() == range, range term is confusing, print fmt combines printf and stdcout
                 }
             });
         }
@@ -260,7 +260,7 @@ int main(int argc, char const* const* argv){
         for (auto i : cursor) {  
             auto [sa, offset] = reduced_index.locate(i); // cursor stuff
             auto [chr, pos] = sa;
-            hit_log << fmt::format("query_index/position_of_hit: {}/{} with {} errors\n", queryId, chr, pos+offset, errors);  // cursor.count() == range, range term is confusing, print fmt combines printf and stdcout
+            hit_log << fmt::format("query_index/position_of_hit: {}/{} with {} errors\n", queryId, pos+offset, errors);  // cursor.count() == range, range term is confusing, print fmt combines printf and stdcout
         }
         });
         }
